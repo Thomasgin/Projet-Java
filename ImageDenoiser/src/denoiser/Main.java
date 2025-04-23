@@ -11,13 +11,18 @@ public class Main {
             BufferedImage image = loadImage("images_sources/lena.jpeg");
 
             // Appliquer le bruit gaussien
-            double sigma = 25.0;
-            BufferedImage noisy = ImageUtils.noising(image, sigma);
+            double sigma = 10;
+            for (int i = 0; i<4; i++) {
+            	BufferedImage noisy = ImageUtils.noising(image, sigma);
 
-            // Sauvegarder l’image bruitée
-            saveImage(noisy, "images_bruitees/lena_noisy_sigma25.jpeg");
+                // Sauvegarder l’image bruitée
+                saveImage(noisy, "images_bruitees/lena_bruitee_" + sigma + ".jpeg");
 
-            System.out.println("Image bruitée sauvegardée.");
+                System.out.println("Image bruitée sauvegardée.");
+                
+                // augmenter la valeur du bruit
+                sigma += 10;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
