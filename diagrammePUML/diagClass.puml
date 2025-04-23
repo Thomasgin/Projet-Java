@@ -1,0 +1,63 @@
+@startuml
+title Diagramme de classes – Débruitage d’images par ACP
+
+class Main {
+  + main(args: String[]): void
+  + loadImage(path: String): BufferedImage
+  + saveImage(img: BufferedImage, path: String): void
+}
+
+class ImageUtils {
+  + noising(X0: BufferedImage, sigma: double): BufferedImage
+  + extractPatches(X: BufferedImage, s: int): List<Patch>
+  + reconstructPatches(patches: List<Patch>, width: int, height: int): BufferedImage
+  + decoupeImage(X: BufferedImage, W: int, n: int): List<ImageZone>
+}
+
+class Patch {
+  - data: double[][]
+  - positionX: int
+  - positionY: int
+  + toVector(): double[]
+  + fromVector(v: double[]): Patch
+}
+
+class ACP {
+  + mean(V: List<double[]>): double[]
+  + covariance(V: List<double[]>): double[][]
+  + computeACP(V: List<double[]>): double[][]
+  + project(U: double[][], Vc: List<double[]>): double[][]
+}
+
+class Thresholding {
+  + seuilVisu(sigma: double, size: int): double
+  + seuilBayes(sigma: double, sigmaSignal: double): double
+  + hard(lambda: double, x: double): double
+  + soft(lambda: double, x: double): double
+}
+
+class Evaluation {
+  + mse(original: BufferedImage, denoised: BufferedImage): double
+  + psnr(original: BufferedImage, mse: double): double
+}
+
+class ImageZone {
+  - image: BufferedImage
+  - x: int
+  - y: int
+  + getImage(): BufferedImage
+  + getPosition(): (int, int)
+}
+
+' Relations
+Main --> ImageUtils
+Main --> ACP
+Main --> Thresholding
+Main --> Evaluation
+Main --> Interface
+ImageUtils --> Patch
+ImageUtils --> ImageZone
+ACP --> Patch
+Thresholding --> Patch
+
+@enduml
