@@ -1,0 +1,29 @@
+@startuml
+actor Utilisateur
+participant "Main" as M
+participant "ImageUtils" as IU
+participant "ACP" as A
+
+Utilisateur -> M : Charger l'image
+M -> IU : noising(X0, σ)
+IU --> M : Xb
+
+alt Extraction Globale
+  M -> IU : extractPatches(Xb, s)
+else Extraction Locale
+  M -> IU : decoupeImage(Xb, W, n)
+  IU -> IU : extractPatches(zone, s) **pour chaque zone**
+end
+IU --> M : Liste de Patchs
+
+M -> A : ACP(Vk)
+A --> M : Base {ui}
+
+alt Seuillage Dur
+  M -> A : SeuillageDur(αi, λV)
+else Seuillage Doux
+  M -> A : SeuillageDoux(αi, λB)
+end
+A --> M : Coefficients seuillés
+M -> IU : reconstructPatches()
+@enduml

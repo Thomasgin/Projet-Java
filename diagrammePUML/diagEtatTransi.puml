@@ -1,0 +1,15 @@
+@startuml
+[*] --> PatchBruté
+PatchBruté --> PatchVectorisé : Vectorisation
+PatchVectorisé --> CoefficientsCalculés : Projection ACP
+
+state "Seuillage" as S {
+  [*] --> ChoixSeuillage
+  ChoixSeuillage --> SeuillageDur : λ = VisuShrink
+  ChoixSeuillage --> SeuillageDoux : λ = BayesShrink
+}
+
+CoefficientsCalculés --> S : Appliquer seuil
+S --> PatchDébruité : Reconstruction
+PatchDébruité --> [*]
+@enduml

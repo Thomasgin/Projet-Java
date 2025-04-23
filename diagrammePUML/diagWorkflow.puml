@@ -1,0 +1,32 @@
+@startuml
+start
+:Charger X0;
+:Bruiter X0 (σ=10/20/30);
+
+partition ExtractionPatchs {
+  if (Type d'extraction?) then (Globale)
+    :Extraire patchs (s×s) sur toute l'image;
+  else (Locale)
+    :Découper en zones W×W;
+    :Extraire patchs (s×s) par zone;
+  endif
+}
+
+partition ACP {
+  :Vectoriser patchs → Vk;
+  :Calculer base ACP {ui};
+  if (Seuillage?) then (Dur)
+    :SeuillageDur(λ=VisuShrink);
+  else (Doux)
+    :SeuillageDoux(λ=BayesShrink);
+  endif
+}
+
+partition Reconstruction {
+  :Reconstruire patchs seuillés;
+  :Assembler → X̂;
+}
+
+:Calculer MSE/PSNR(X0, X̂);
+stop
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+left to right direction
+actor Utilisateur as U
+
+rectangle "Débruitage d'images par ACP" {
+  U --> (Ajouter du bruit gaussien à une image)
+  U --> (Extraire des patchs d'une image)
+  U --> (Appliquer l'ACP sur les patchs)
+  U --> (Seuillage dur/doux des coefficients)
+  U --> (Reconstruire l'image débruitée)
+  U --> (Évaluer la qualité (MSE/PSNR))
+  
+  (Extraire des patchs d'une image) .> (Global PCA) : inclut
+  (Extraire des patchs d'une image) .> (Local PCA) : inclut
+  (Appliquer l'ACP sur les patchs) .> (Calculer la base orthonormale) : inclut
+  (Seuillage dur/doux des coefficients) .> (Choix du seuil VisuShrink/BayesShrink) : inclut
+}
+@enduml
