@@ -16,7 +16,7 @@ public class Main {
             	BufferedImage noisy = ImageUtils.noising(image, sigma);
 
                 // Sauvegarder l’image bruitée
-                saveImage(noisy, "images_bruitees/lena_bruitee_" + sigma + ".jpeg");
+                saveImage(noisy, "images_bruitees/lena_noisy_sigma" + sigma + ".jpeg");
 
                 System.out.println("Image bruitée sauvegardée.");
                 
