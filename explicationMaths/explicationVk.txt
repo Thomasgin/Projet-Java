@@ -1,0 +1,8 @@
+﻿🔹 Interprétation de la décomposition
+Dans la décomposition Vk​=mV​+∑i=1d​αi(k)​ui​, le terme mV​ représente la composante moyenne des patchs, c’est-à-dire les informations globalement partagées par l’ensemble des vecteurs. Il constitue une sorte de "fond statistique commun".
+La variation spécifique de chaque patch autour de cette moyenne est exprimée par la somme ∑αi(k)​ui​, qui représente la projection du vecteur centré dans la base orthonormale obtenue par l’ACP.
+Parmi les coefficients αi(k)​ :
+    • Les composantes dominantes (grandes valeurs absolues) sont associées aux directions principales de la base ACP, et donc supposées contenir le signal utile.
+    • Les composantes faibles sont souvent dues à des fluctuations aléatoires, et donc assimilées au bruit.
+L’objectif du seuillage est alors de conserver les composantes significatives du signal, tout en éliminant les contributions mineures susceptibles de représenter du bruit.
+
