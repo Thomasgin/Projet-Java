@@ -1,5 +1,5 @@
 @startuml
-title Diagramme de classes – Débruitage d’images par ACP (complet)
+title Diagramme de classes
 
 class Main {
   + main(args: String[]): void
