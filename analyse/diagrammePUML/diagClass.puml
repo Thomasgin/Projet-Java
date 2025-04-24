@@ -1,5 +1,5 @@
 @startuml
-title Diagramme de classes – Débruitage d’images par ACP
+title Diagramme de classes – Débruitage d’images par ACP (complet)
 
 class Main {
   + main(args: String[]): void
@@ -9,8 +9,8 @@ class Main {
 
 class ImageUtils {
   + noising(X0: BufferedImage, sigma: double): BufferedImage
-  + extractPatches(X: BufferedImage, s: int): List<Patch>
-  + reconstructPatches(patches: List<Patch>, width: int, height: int): BufferedImage
+  + extractPatches(X: BufferedImage, s: int): PatchSet
+  + reconstructPatches(p: PatchSet, width: int, height: int): BufferedImage
   + decoupeImage(X: BufferedImage, W: int, n: int): List<ImageZone>
 }
 
@@ -20,6 +20,13 @@ class Patch {
   - positionY: int
   + toVector(): double[]
   + fromVector(v: double[]): Patch
+}
+
+class PatchSet {
+  - patchs: List<Patch>
+  - origine: String
+  + getPatchs(): List<Patch>
+  + taille(): int
 }
 
 class ACP {
@@ -37,8 +44,8 @@ class Thresholding {
 }
 
 class Evaluation {
-  + mse(original: BufferedImage, denoised: BufferedImage): double
-  + psnr(original: BufferedImage, mse: double): double
+  + mse(X1: BufferedImage, X2: BufferedImage): double
+  + psnr(X1: BufferedImage, mse: double): double
 }
 
 class ImageZone {
@@ -49,15 +56,49 @@ class ImageZone {
   + getPosition(): (int, int)
 }
 
+class Interface {
+  + afficherImage(img: BufferedImage)
+  + afficherResultats(mse: double, psnr: double, gain: double)
+  + récupérerParamètres(): Parametre
+  + appliquerDébruitage(): void
+}
+
+class Parametre {
+  + sigma: double
+  + taillePatch: int
+  + modeExtraction: String
+  + typeSeuillage: String
+  + tailleZone: int
+}
+
+class ImageData {
+  + originale: BufferedImage
+  + bruitée: BufferedImage
+  + reconstruite: BufferedImage
+  + nom: String
+}
+
 ' Relations
+Main --> Interface
 Main --> ImageUtils
 Main --> ACP
 Main --> Thresholding
 Main --> Evaluation
-Main --> Interface
+
+Interface --> Parametre
+Interface --> Main : utiliser()
+
 ImageUtils --> Patch
+ImageUtils --> PatchSet
 ImageUtils --> ImageZone
+ImageUtils --> ImageData
+
 ACP --> Patch
+ACP --> PatchSet
+
 Thresholding --> Patch
 
+Evaluation --> ImageData
+
 @enduml
+

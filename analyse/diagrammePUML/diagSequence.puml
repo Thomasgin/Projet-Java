@@ -1,29 +1,42 @@
 @startuml
+title Diagramme de séquence – avec Parametre et ImageData
+
 actor Utilisateur
+participant "Interface" as I
+participant "Parametre" as P
 participant "Main" as M
 participant "ImageUtils" as IU
 participant "ACP" as A
+participant "Thresholding" as T
+participant "ImageData" as D
+participant "Evaluation" as E
 
-Utilisateur -> M : Charger l'image
+Utilisateur -> I : Configurer les paramètres
+I -> P : Instancier Parametre
+I -> M : appliquerDébruitage(param: Parametre)
+
+M -> IU : loadImage()
 M -> IU : noising(X0, σ)
-IU --> M : Xb
 
 alt Extraction Globale
   M -> IU : extractPatches(Xb, s)
 else Extraction Locale
   M -> IU : decoupeImage(Xb, W, n)
-  IU -> IU : extractPatches(zone, s) **pour chaque zone**
+  IU -> IU : extractPatches(zone, s)
 end
-IU --> M : Liste de Patchs
+IU --> M : Liste de patchs
 
-M -> A : ACP(Vk)
-A --> M : Base {ui}
+M -> A : computeACP(patchs)
+A -> A : mean(), covariance(), SVD
+A --> M : Base {u_i}
 
-alt Seuillage Dur
-  M -> A : SeuillageDur(αi, λV)
-else Seuillage Doux
-  M -> A : SeuillageDoux(αi, λB)
-end
-A --> M : Coefficients seuillés
+M -> T : seuilVisu() / seuilBayes()
+T -> T : hard() / soft()
+T --> M : Coefficients seuillés
+
 M -> IU : reconstructPatches()
+M -> D : Créer ImageData(originale, bruitée, reconstruite)
+M -> E : mse(D), psnr(D)
+
+M -> I : afficherResultats(mse, psnr)
 @enduml
