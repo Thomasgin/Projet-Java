@@ -1,5 +1,5 @@
 @startuml
-title Diagramme de séquence – avec Parametre et ImageData
+title Diagramme de séquence
 
 actor Utilisateur
 participant "Interface" as I
