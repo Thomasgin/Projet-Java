@@ -1,11 +1,21 @@
+import java.io.File;
+
 import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class Maquette extends Application {
+	
+	private String path;
+	private ImageView imageBruitee;
+	private Label placeholderLabelBruitee;
 
     @Override
     public void start(Stage primaryStage) {
@@ -38,6 +48,23 @@ public class Maquette extends Application {
         ComboBox<String> thresholdMethod = new ComboBox<>();
         thresholdMethod.getItems().addAll("Seuillage dur", "Seuillage doux");
         thresholdMethod.setValue("Seuillage dur");
+        
+        Button appliquerBruitage = new Button("Appliquer le bruitage");
+        appliquerBruitage.setMaxWidth(Double.MAX_VALUE);
+        appliquerBruitage.setStyle("-fx-background-color: #303f9f; -fx-text-fill: white; -fx-font-weight: 500;");
+        appliquerBruitage.setOnAction(e -> {
+        	try {
+				Main.principal(path);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	imageBruitee.setImage(new Image("file:/home/cytech/Java/javafx/tp5/images/bruitees/image_noisy_sigma20.0.png"));
+        	imageBruitee.setVisible(true);
+            placeholderLabelBruitee.setVisible(false);
+
+        });
+        
 
         Button applyButton = new Button("Appliquer le débruitage");
         applyButton.setMaxWidth(Double.MAX_VALUE);
@@ -52,10 +79,11 @@ public class Maquette extends Application {
         });
 
         paramsPanel.getChildren().addAll(
+        		createParamGroup("Niveau de bruit (σ)", noiseSlider, noiseLabel),
+        		appliquerBruitage,
                 createParamGroup("Type d'extraction", extractionType),
                 createParamGroup("Taille des patchs", patchSizeSlider, patchSizeLabel),
                 createParamGroup("Méthode de seuillage", thresholdMethod),
-                createParamGroup("Niveau de bruit (σ)", noiseSlider, noiseLabel),
                 applyButton
         );
 
@@ -67,8 +95,8 @@ public class Maquette extends Application {
         HBox imageContainer = new HBox(20);
         imageContainer.setAlignment(Pos.CENTER);
         imageContainer.getChildren().addAll(
-                createImageBox("Image originale", "Originale"),
-                createImageBox("Image bruitée", "Bruitée (σ=20)"),
+                createImageBoxImportable("Image originale", "Originale"),
+                createDynamicImageBox("Image bruitée", "Bruitée (σ=20)"),
                 createImageBox("Image débruitée", "Résultat")
         );
 
@@ -127,6 +155,84 @@ public class Maquette extends Application {
         box.getChildren().add(valueLabel);
         return box;
     }
+    
+    private VBox createImageBoxImportable(String defaultText, String caption) {
+        VBox box = new VBox(12);
+        box.setAlignment(Pos.TOP_CENTER);
+        box.setPadding(new Insets(15));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 6px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 3, 0, 0, 1);");
+
+        StackPane imageContainer = new StackPane();
+        imageContainer.setPrefHeight(220);
+        imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #bdbdbd; -fx-border-style: dashed; -fx-border-radius: 4px;");
+
+        Label placeholderLabel = new Label(defaultText);
+        placeholderLabel.setTextFill(Color.web("#757575"));
+
+        ImageView imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+        imageView.setFitHeight(220);
+        imageView.setVisible(false);
+
+        imageContainer.getChildren().addAll(imageView, placeholderLabel);
+
+        Button importButton = new Button("Importer");
+        importButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choisir une image");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif")
+            );
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+            	path = file.getAbsolutePath();
+            	Image image = new Image("file:"+path);
+                imageView.setImage(image);
+                imageView.setVisible(true);
+                placeholderLabel.setVisible(false);
+                importButton.setText("Changer");
+            }
+        });
+
+        Label captionLabel = new Label(caption);
+        captionLabel.setStyle("-fx-font-weight: 500;");
+
+        box.getChildren().addAll(imageContainer, importButton, captionLabel);
+        return box;
+    }
+    
+    private VBox createDynamicImageBox(String defaultText, String caption) {
+        VBox box = new VBox(12);
+        box.setAlignment(Pos.TOP_CENTER);
+        box.setPadding(new Insets(15));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 6px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 3, 0, 0, 1);");
+
+        StackPane imageContainer = new StackPane();
+        imageContainer.setPrefHeight(220);
+        imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #bdbdbd; -fx-border-style: dashed; -fx-border-radius: 4px;");
+
+        placeholderLabelBruitee = new Label(defaultText);
+        placeholderLabelBruitee.setTextFill(Color.web("#757575"));
+
+        imageBruitee = new ImageView();
+        imageBruitee.setPreserveRatio(true);
+        imageBruitee.setFitHeight(220);
+        imageBruitee.setVisible(false);
+
+        // Ajouter au conteneur
+        imageContainer.getChildren().addAll(imageBruitee, placeholderLabelBruitee);
+
+        Label captionLabel = new Label(caption);
+        captionLabel.setStyle("-fx-font-weight: 500;");
+
+        // On stocke aussi le placeholder pour pouvoir le cacher plus tard
+        imageBruitee.getProperties().put("placeholder", placeholderLabelBruitee);
+
+        box.getChildren().addAll(imageContainer, captionLabel);
+        return box;
+    }
+
+
 
     private VBox createImageBox(String placeholder, String caption) {
         Label placeholderLabel = new Label(placeholder);
