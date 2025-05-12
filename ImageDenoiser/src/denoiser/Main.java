@@ -2,6 +2,8 @@ package denoiser;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.List;
 import javax.imageio.ImageIO;
 
@@ -14,7 +16,7 @@ public class Main {
             // 2. Ajout de bruit
             double sigma = 25.0;
             BufferedImage noisy = ImageUtils.noising(original, sigma);
-            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy1.jpeg");
+            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
             // 3. Extraction des patchs
             int s = 8;
@@ -32,39 +34,61 @@ public class Main {
             List<double[]> Vc = ACP.MoyCov(vectors).Vc;
             double[][] contributions = ACP.project(acpResult.base, Vc);
 
-            // 7. Calcul du lambda (choisir entre VisuShrink ou BayesShrink)
-            // (A) Pour VisuShrink :
-            //double lambda = Thresholding.seuilVisu(sigma, s * s);
+            // 7. Dossier de sortie pour sigma
+            String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
+            File dir = new File(sigmaDir);
+            if (!dir.exists()) dir.mkdirs();
 
-            // (B) Pour BayesShrink :
-            double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
-            double lambda = Thresholding.seuilBayes(sigma, sigmaSignal);
+            // 8. Écriture du fichier résultats
+            FileWriter fw = new FileWriter(sigmaDir + "resultats.txt");
+            PrintWriter pw = new PrintWriter(fw);
 
-            // 8. Seuillage des contributions (true = doux, false = dur)
-            double[][] contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, false);
+            String[] noms = { "DouxBayes", "DurBayes", "DouxVisu", "DurVisu" };
+            boolean[] softFlags = { true, false, true, false };
+            boolean[] bayesFlags = { true, true, false, false };
 
-            // 9. Reconstruction des vecteurs
-            List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
-                contributionsSeuillees,
-                acpResult.base,
-                acpResult.moyenne
-            );
+            for (int i = 0; i < 4; i++) {
+                String nom = noms[i];
+                boolean isSoft = softFlags[i];
+                boolean isBayes = bayesFlags[i];
 
-            // 10. Reconstruction de l'image depuis les patchs
-            List<Patch> reconstructedPatches = new java.util.ArrayList<>();
-            for (int i = 0; i < reconstructions.size(); i++) {
-                Patch originalPatch = patches.get(i);
-                double[] reconstructedData = reconstructions.get(i);
-                Patch reconstructedPatch = new Patch(reconstructedData, originalPatch.positionX, originalPatch.positionY);
-                reconstructedPatches.add(reconstructedPatch);
+                // Calcul lambda
+                double lambda;
+                if (isBayes) {
+                    double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
+                    lambda = Thresholding.seuilBayes(sigma, sigmaSignal);
+                } else {
+                    lambda = Thresholding.seuilVisu(sigma, s * s);
+                }
+
+                // Seuillage
+                double[][] contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, isSoft);
+
+                // Reconstruction
+                List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
+                    contributionsSeuillees, acpResult.base, acpResult.moyenne);
+
+                List<Patch> reconstructedPatches = new java.util.ArrayList<>();
+                for (int j = 0; j < reconstructions.size(); j++) {
+                    Patch originalPatch = patches.get(j);
+                    double[] data = reconstructions.get(j);
+                    reconstructedPatches.add(new Patch(data, originalPatch.positionX, originalPatch.positionY));
+                }
+
+                BufferedImage result = ImageUtils.reconstructPatches(
+                    reconstructedPatches, original.getHeight(), original.getWidth());
+
+                String outPath = sigmaDir + nom + ".jpeg";
+                saveImage(result, outPath);
+
+                double mse = Evaluation.mse(original, result);
+                double psnr = Evaluation.psnr(mse);
+
+                pw.printf("%s : MSE = %.2f, PSNR = %.2f dB%n", nom, mse, psnr);
             }
 
-            BufferedImage denoised = ImageUtils.reconstructPatches(reconstructedPatches, noisy.getHeight(), noisy.getWidth());
-
-            // 11. Sauvegarde
-            saveImage(denoised, "ImageDenoiser/images_reconstruites/denoised.jpeg");
-
-            System.out.println("Traitement terminé avec succès.");
+            pw.close();
+            System.out.println("Traitement terminé pour sigma = " + sigma + ".");
 
         } catch (Exception e) {
             System.err.println("Erreur lors du traitement : " + e.getMessage());

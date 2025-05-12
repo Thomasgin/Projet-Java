@@ -130,5 +130,32 @@ public class ImageUtils {
 
         return result;
     }
+    
+    public static double computeMSE(BufferedImage img1, BufferedImage img2) {
+        int width = img1.getWidth();
+        int height = img1.getHeight();
+        double mse = 0.0;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel1 = img1.getRaster().getSample(x, y, 0);
+                int pixel2 = img2.getRaster().getSample(x, y, 0);
+                double diff = pixel1 - pixel2;
+                mse += diff * diff;
+            }
+        }
+
+        mse /= (width * height);
+        return mse;
+    }
+    
+    public static double computePSNR(double mse) {
+        if (mse == 0) {
+            return Double.POSITIVE_INFINITY; // Images identiques
+        }
+        return 10 * Math.log10((255 * 255) / mse);
+    }
+
+
 
 }

@@ -13,7 +13,7 @@ public class Thresholding {
     // Seuil BayesShrink (sigma^2 / sigmaSignal)
     public static double seuilBayes(double sigma, double sigmaSignal) {
         if (sigmaSignal == 0) return 0;
-        return (sigma * sigma) / sigmaSignal;
+        return 1.5*(sigma * sigma) / (sigmaSignal+0.00001);
     }
 
     // Estimation globale de sigma_x (σ_signal) à partir de toutes les contributions projetées
