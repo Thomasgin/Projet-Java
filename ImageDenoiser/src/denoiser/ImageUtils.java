@@ -41,14 +41,16 @@ public class ImageUtils {
 
         int width = X.getWidth();
         int height = X.getHeight();
-        int offset = s / 2;
+        int half = s / 2;
+        int start = (s % 2 == 0) ? -half : -half;
+        int end   = (s % 2 == 0) ? half - 1 : half;
 
-        for (int y = offset; y < height - offset; y++) {
-            for (int x = offset; x < width - offset; x++) {
+        for (int y = half; y < height - half; y++) {
+            for (int x = half; x < width - half; x++) {
                 double[] patchData = new double[s * s];
                 int idx = 0;
-                for (int dy = -offset; dy <= offset; dy++) {
-                    for (int dx = -offset; dx <= offset; dx++) {
+                for (int dy = start; dy <= end; dy++) {
+                    for (int dx = start; dx <= end; dx++) {
                         int val = raster.getSample(x + dx, y + dy, 0);
                         patchData[idx++] = val;
                     }
@@ -65,7 +67,9 @@ public class ImageUtils {
         int[][] count = new int[height][width];
 
         int patchSize = (int) Math.sqrt(patches.get(0).data.length);
-        int offset = patchSize / 2;
+        int half = patchSize / 2;
+        int start = (patchSize % 2 == 0) ? -half : -half;
+        int end   = (patchSize % 2 == 0) ? half - 1 : half;
 
         for (Patch patch : patches) {
             double[] data = patch.data;
@@ -73,8 +77,8 @@ public class ImageUtils {
             int y0 = patch.positionY;
 
             int idx = 0;
-            for (int dy = -offset; dy <= offset; dy++) {
-                for (int dx = -offset; dx <= offset; dx++) {
+            for (int dy = start; dy <= end; dy++) {
+                for (int dx = start; dx <= end; dx++) {
                     int x = x0 + dx;
                     int y = y0 + dy;
 
@@ -86,6 +90,7 @@ public class ImageUtils {
                 }
             }
         }
+
 
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
         WritableRaster raster = result.getRaster();
@@ -125,7 +130,5 @@ public class ImageUtils {
 
         return result;
     }
-
-
 
 }

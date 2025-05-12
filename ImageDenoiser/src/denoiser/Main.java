@@ -2,22 +2,63 @@ package denoiser;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.imageio.ImageIO;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 public class Main {
     public static void main(String[] args) {
-        try {
-            BufferedImage image = loadImage("ImageDenoiser/images_bruitees/lena_noisy_sigma25.jpeg");
+       try {
+            // 1. Chargement de l'image originale
+            BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
 
-            List<Patch> patches = ImageUtils.extractPatches(image, 7);
-            List<VectorWithPosition> vectorWithPositions = ImageUtils.VectorPatchs(patches);
+            // 2. Ajout de bruit gaussien
+            double sigma = 25.0;
+            BufferedImage noisy = ImageUtils.noising(original, sigma);
+            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy1.jpeg");
 
-            System.out.println("Nombre de vecteurs : " + vectorWithPositions.size());
-            VectorWithPosition first = vectorWithPositions.get(0);
-            System.out.println("Premier vecteur : " + java.util.Arrays.toString(first.vector));
-            System.out.println("Position : (" + first.x + ", " + first.y + ")");
-            
+            // 3. Extraction des patchs
+            int s = 8; // Taille du patch (s x s)
+            List<Patch> patches = ImageUtils.extractPatches(noisy, s);
+
+            // 4. Conversion des patchs en vecteurs
+            List<double[]> vectors = patches.stream()
+                                            .map(p -> p.toVector())
+                                            .toList();
+
+            // 5. Application de l'ACP
+            ACPResult acpResult = ACP.computeACP(vectors);
+
+            // 6. Projection des vecteurs centrés
+            List<double[]> Vc = ACP.MoyCov(vectors).Vc;
+            double[][] contributions = ACP.project(acpResult.base, Vc);
+
+            // 7. Seuillage des contributions
+            double lambda = Thresholding.seuilBayes(sigma, s * s);
+            double[][] contributionsSeuillees = Thresholding.seuillageDouxBayes(contributions, lambda);
+
+            // 8. Reconstruction des vecteurs depuis les contributions seuillées
+            List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
+                contributionsSeuillees,
+                acpResult.base,
+                acpResult.moyenne
+            );
+
+            // 9. Reconstruction de l'image depuis les patchs reconstruits
+            List<Patch> reconstructedPatches = new java.util.ArrayList<>();
+            for (int i = 0; i < reconstructions.size(); i++) {
+                Patch originalPatch = patches.get(i);
+                double[] reconstructedData = reconstructions.get(i);
+                Patch reconstructedPatch = new Patch(reconstructedData, originalPatch.positionX, originalPatch.positionY);
+                reconstructedPatches.add(reconstructedPatch);
+            }
+
+            BufferedImage denoised = ImageUtils.reconstructPatches(reconstructedPatches, noisy.getHeight(), noisy.getWidth());
+
+            // 10. Sauvegarde des images
+            saveImage(denoised, "ImageDenoiser/images_reconstruites/denoised.jpeg");
+
+            System.out.println("Traitement terminé avec succès.");
+
         } catch (Exception e) {
             System.err.println("Erreur lors du traitement : " + e.getMessage());
             e.printStackTrace();
