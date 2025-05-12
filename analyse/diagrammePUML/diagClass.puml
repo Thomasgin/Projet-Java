@@ -1,17 +1,23 @@
 @startuml
-title Diagramme de classes
+title Diagramme de classes - Application de débruitage d'images
+
+class Image {
+  - bufferedImage: BufferedImage
+  - width: int
+  - height: int
+  + getBufferedImage(): BufferedImage
+  + getWidth(): int
+  + getHeight(): int
+  + load(path: String): void
+  + save(path: String): void
+  + extractPatches(s: int): PatchSet
+  + decoupe(W: int, n: int): List<ImageZone>
+  + applyNoise(sigma: double): Image
+  + reconstructFromPatches(p: PatchSet): Image
+}
 
 class Main {
   + main(args: String[]): void
-  + loadImage(path: String): BufferedImage
-  + saveImage(img: BufferedImage, path: String): void
-}
-
-class ImageUtils {
-  + noising(X0: BufferedImage, sigma: double): BufferedImage
-  + extractPatches(X: BufferedImage, s: int): PatchSet
-  + reconstructPatches(p: PatchSet, width: int, height: int): BufferedImage
-  + decoupeImage(X: BufferedImage, W: int, n: int): List<ImageZone>
 }
 
 class Patch {
@@ -23,82 +29,85 @@ class Patch {
 }
 
 class PatchSet {
-  - patchs: List<Patch>
+  - patches: List<Patch>
   - origine: String
-  + getPatchs(): List<Patch>
-  + taille(): int
+  + getPatches(): List<Patch>
+  + size(): int
+  + mean(): double[]
+  + covariance(): double[][]
 }
 
 class ACP {
-  + mean(V: List<double[]>): double[]
-  + covariance(V: List<double[]>): double[][]
-  + computeACP(V: List<double[]>): double[][]
-  + project(U: double[][], Vc: List<double[]>): double[][]
+  - patchSet: PatchSet
+  + compute(): double[][]
+  + project(Vc: List<double[]>): double[][]
 }
 
 class Thresholding {
-  + seuilVisu(sigma: double, size: int): double
-  + seuilBayes(sigma: double, sigmaSignal: double): double
+  - patch: Patch
+  + visuThreshold(sigma: double, size: int): double
+  + bayesThreshold(sigma: double, sigmaSignal: double): double
   + hard(lambda: double, x: double): double
   + soft(lambda: double, x: double): double
 }
 
 class Evaluation {
-  + mse(X1: BufferedImage, X2: BufferedImage): double
-  + psnr(X1: BufferedImage, mse: double): double
+  - original: Image
+  - processed: Image
+  + mse(): double
+  + psnr(): double
 }
 
 class ImageZone {
-  - image: BufferedImage
+  - image: Image
   - x: int
   - y: int
-  + getImage(): BufferedImage
+  + getImage(): Image
   + getPosition(): (int, int)
 }
 
 class Interface {
-  + afficherImage(img: BufferedImage)
-  + afficherResultats(mse: double, psnr: double, gain: double)
-  + récupérerParamètres(): Parametre
-  + appliquerDébruitage(): void
+  - controller: Main
+  + displayImage(img: Image)
+  + displayResults(mse: double, psnr: double, gain: double)
+  + getParameters(): Parameters
+  + applyDenoising(): void
 }
 
-class Parametre {
+class Parameters {
   + sigma: double
-  + taillePatch: int
-  + modeExtraction: String
-  + typeSeuillage: String
-  + tailleZone: int
-}
-
-class ImageData {
-  + originale: BufferedImage
-  + bruitée: BufferedImage
-  + reconstruite: BufferedImage
-  + nom: String
+  + patchSize: int
+  + extractionMode: String
+  + thresholdType: String
+  + zoneSize: int
 }
 
 ' Relations
 Main --> Interface
-Main --> ImageUtils
-Main --> ACP
-Main --> Thresholding
-Main --> Evaluation
+Main --> Image
 
-Interface --> Parametre
-Interface --> Main : utiliser()
+Image "1" *-- "many" ImageZone
+Image "1" *-- "many" Patch
+Image "1" *-- "1" Evaluation
 
-ImageUtils --> Patch
-ImageUtils --> PatchSet
-ImageUtils --> ImageZone
-ImageUtils --> ImageData
+PatchSet "1" *-- "many" Patch
+PatchSet --> ACP
+PatchSet --> Thresholding
 
-ACP --> Patch
-ACP --> PatchSet
+Interface ..> Parameters : utilise
 
-Thresholding --> Patch
+Evaluation --> Image : évalue
+ACP --> PatchSet : traite
+Thresholding --> Patch : seuille
 
-Evaluation --> ImageData
+note top of Image
+  Encapsule toutes les fonctionnalités
+  liées au traitement d'image
+end note
+
+note top of PatchSet
+  Contient l'ensemble des patches
+  et fournit des méthodes statistiques
+end note
 
 @enduml
-
