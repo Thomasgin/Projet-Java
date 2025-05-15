@@ -31,11 +31,11 @@ public class Main {
            	
         	
             // 1. Chargement de l'image originale
-            BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
+            BufferedImage original = loadImage("images_sources/lena.jpeg");
 
             // 2. Ajout de bruit
             BufferedImage noisy = ImageUtils.noising(original, sigma);
-            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
+            saveImage(noisy, "images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
             localDenoising(8, sigma, noisy, original);
             globalDenoising(8, sigma, noisy, original);
@@ -65,7 +65,7 @@ public class Main {
         double[][] contributions = ACP.project(acpResult.base, Vc);
 
         // 7. Dossier de sortie pour sigma
-        String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
+        String sigmaDir = "images_reconstruites/sigma" + (int) sigma + "/";
         File dir = new File(sigmaDir);
         if (!dir.exists()) dir.mkdirs();
 
@@ -173,7 +173,7 @@ public class Main {
         }
 
         // Recomposition, sauvegarde et évaluation
-        String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
+        String sigmaDir = "images_reconstruites/sigma" + (int) sigma + "/";
         new File(sigmaDir).mkdirs();
 
         FileWriter fw = new FileWriter(sigmaDir + "resultats_local.txt");
