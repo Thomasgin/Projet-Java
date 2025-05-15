@@ -16,7 +16,7 @@ public class Main {
             BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
 
             // 2. Ajout de bruit
-            double sigma = 35.0;
+            double sigma = 25.0;
             BufferedImage noisy = ImageUtils.noising(original, sigma);
             saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
@@ -53,7 +53,7 @@ public class Main {
         if (!dir.exists()) dir.mkdirs();
 
         // 8. Écriture du fichier résultats
-        FileWriter fw = new FileWriter(sigmaDir + "resultats.txt");
+        FileWriter fw = new FileWriter(sigmaDir + "resultats_global.txt");
         PrintWriter pw = new PrintWriter(fw);
 
         String[] noms = { "DouxBayes", "DurBayes", "DouxVisu", "DurVisu" };
@@ -105,111 +105,79 @@ public class Main {
     }
     
     public static void localDenoising(int s, double sigma, BufferedImage noisy, BufferedImage original) throws IOException {
-        int W = 64; // Taille des zones locales
-        int pas = 64; // Pas de déplacement : non chevauchantes
+        int W = 64;
+        int pas = 64;
+
         List<ImageZone> zones = ImageUtils.decoupeImage(noisy, W, pas);
-        List<ImageZone> denoisedZonesBayesSoft = new ArrayList<>();
-        List<ImageZone> denoisedZonesVisuSoft = new ArrayList<>();
-        List<ImageZone> denoisedZonesBayesHard = new ArrayList<>();
-        List<ImageZone> denoisedZonesVisuHard = new ArrayList<>();
+
+        // Préparation des listes pour les 4 méthodes
+        List<List<ImageZone>> zonesParMethode = new ArrayList<>();
+        for (int i = 0; i < 4; i++) zonesParMethode.add(new ArrayList<>());
+
+        String[] noms = { "BayesSoft", "BayesHard", "VisuSoft", "VisuHard" };
+        boolean[] softFlags = { true, false, true, false };
+        boolean[] bayesFlags = { true, true, false, false };
 
         for (ImageZone zone : zones) {
             BufferedImage subImage = zone.getImage();
             int offsetX = zone.getPosition()[0];
             int offsetY = zone.getPosition()[1];
 
-         // 3. Extraction des patchs
-            List<Patch> patches = ImageUtils.extractPatches(noisy, s);
-
-            // 4. Conversion en vecteurs
-            List<double[]> vectors = patches.stream()
-                                            .map(Patch::toVector)
-                                            .toList();
-
-            // 5. ACP
+            // Pipeline
+            List<Patch> patches = ImageUtils.extractPatches(subImage, s);
+            List<double[]> vectors = patches.stream().map(Patch::toVector).toList();
             ACPResult acpResult = ACP.computeACP(vectors);
-
-            // 6. Projection
             List<double[]> Vc = ACP.MoyCov(vectors).Vc;
             double[][] contributions = ACP.project(acpResult.base, Vc);
 
-            // 7. Dossier de sortie pour sigma
-            String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
-            File dir = new File(sigmaDir);
-            if (!dir.exists()) dir.mkdirs();
-
-            // 8. Écriture du fichier résultats
-            FileWriter fw = new FileWriter(sigmaDir + "resultats.txt");
-            PrintWriter pw = new PrintWriter(fw);
-
-            String[] noms = { "DouxBayes", "DurBayes", "DouxVisu", "DurVisu" };
-            boolean[] softFlags = { true, false, true, false };
-            boolean[] bayesFlags = { true, true, false, false };
-
             for (int i = 0; i < 4; i++) {
-                String nom = noms[i];
                 boolean isSoft = softFlags[i];
                 boolean isBayes = bayesFlags[i];
 
-                // Calcul lambda
-                double lambda;
-                if (isBayes) {
-                    double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
-                    lambda = Thresholding.seuilBayes(sigma, sigmaSignal);
-                } else {
-                    lambda = Thresholding.seuilVisu(sigma, s * s);
-                }
+                double lambda = isBayes
+                    ? Thresholding.seuilBayes(sigma, Thresholding.estimateGlobalSigmaSignal(contributions, sigma))
+                    : Thresholding.seuilVisu(sigma, s * s);
 
-                // Seuillage
                 double[][] contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, isSoft);
 
-                // Reconstruction
                 List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
                     contributionsSeuillees, acpResult.base, acpResult.moyenne);
 
-                List<Patch> reconstructedPatches = new java.util.ArrayList<>();
+                List<Patch> reconstructedPatches = new ArrayList<>();
                 for (int j = 0; j < reconstructions.size(); j++) {
                     Patch originalPatch = patches.get(j);
-                    double[] data = reconstructions.get(j);
-                    reconstructedPatches.add(new Patch(data, originalPatch.positionX, originalPatch.positionY));
+                    reconstructedPatches.add(new Patch(reconstructions.get(j), originalPatch.positionX, originalPatch.positionY));
                 }
+
                 BufferedImage zoneDenoised = ImageUtils.reconstructPatches(reconstructedPatches, subImage.getHeight(), subImage.getWidth());
-                // Ajout de la zone débruitée dans la liste
-                switch(i) {
-                case 0:
-                	denoisedZonesBayesSoft.add(new ImageZone(zoneDenoised, offsetX, offsetY));
-                }
-	            case 1:
-	            	denoisedZonesBayesHard.add(new ImageZone(zoneDenoised, offsetX, offsetY));
-	            }
-		        case 2:
-		        	denoisedZonesVisuSoft.add(new ImageZone(zoneDenoised, offsetX, offsetY));
-		        }
-			    case 3:
-			    	denoisedZonesVisuHard.add(new ImageZone(zoneDenoised, offsetX, offsetY));
-			    }
-                }
-                
+
+                zonesParMethode.get(i).add(new ImageZone(zoneDenoised, offsetX, offsetY));
             }
-
-        // Recomposition finale
-        BufferedImage result = ImageUtils.recomposeFromZones(denoisedZones, noisy.getWidth(), noisy.getHeight());
-
-        // Sauvegarde de l'image débruitée finale
-        String outputPath = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/Local" + + ".jpeg";
-        saveImage(result, outputPath);
-
-        // Évaluation
-        double mse = Evaluation.mse(original, result);
-        double psnr = Evaluation.psnr(mse);
-
-        // Enregistrement des résultats
-        try (PrintWriter pw = new PrintWriter(new FileWriter("ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/resultats_local.txt"))) {
-            pw.printf("Local_DouxBayes : MSE = %.2f, PSNR = %.2f dB%n", mse, psnr);
         }
 
+        // Recomposition, sauvegarde et évaluation
+        String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
+        new File(sigmaDir).mkdirs();
+
+        FileWriter fw = new FileWriter(sigmaDir + "resultats_local.txt");
+        PrintWriter pw = new PrintWriter(fw);
+
+        for (int i = 0; i < 4; i++) {
+            BufferedImage result = ImageUtils.recomposeFromZones(zonesParMethode.get(i), noisy.getWidth(), noisy.getHeight());
+
+            String outPath = sigmaDir + "Local_" + noms[i] + ".jpeg";
+            saveImage(result, outPath);
+
+            double mse = Evaluation.mse(original, result);
+            double psnr = Evaluation.psnr(mse);
+
+            pw.printf("%s : MSE = %.2f, PSNR = %.2f dB%n", noms[i], mse, psnr);
+        }
+
+        pw.close();
         System.out.println("Traitement local terminé pour sigma = " + sigma + ".");
     }
+
 
 
 
