@@ -7,8 +7,20 @@ import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Use to apply all methode on image as split it, extract patchs, apply noise on it, ...
+ */
 public class ImageUtils {
+    /**
+     * Default constructor
+     */
+    public ImageUtils(){}
+    /**
+     * Apply noise depending on sigma on a image
+     * @param X0 a BufferedImage where we work on it
+     * @param sigma a constant
+     * @return a noise image
+     */
     public static BufferedImage noising(BufferedImage X0, double sigma) {
         int width = X0.getWidth();
         int height = X0.getHeight();
@@ -34,7 +46,13 @@ public class ImageUtils {
         noisy.setData(noisyRaster);
         return noisy;
     }
-    
+
+    /**
+     * Extract patchs from image
+     * @param X a BufferedImage
+     * @param s a constant which is the width of patchs
+     * @return A List of Patch which contains all patchs
+     */
     public static List<Patch> extractPatches(BufferedImage X, int s) {
         List<Patch> patches = new ArrayList<>();
         Raster raster = X.getRaster();
@@ -62,6 +80,13 @@ public class ImageUtils {
         return patches;
     }
     
+    /**
+     * Rebuild an image from a List of Patch
+     * @param patches a list of all patchs
+     * @param height of original image
+     * @param width of the original image
+     * @return A BufferImage which had been rebuilt from patchs
+     */
     public static BufferedImage reconstructPatches(List<Patch> patches, int height, int width) {
         int[][] sum = new int[height][width];
         int[][] count = new int[height][width];
@@ -105,7 +130,13 @@ public class ImageUtils {
 
         return result;
     }
-    
+    /**
+     * Split an image in sub-images
+     * @param X a BufferdImage
+     * @param W a constant to delimitation working zone
+     * @param n gap between cut in original image X
+     * @return A List of ImageZone which contains coordinates of all sub-images
+     */
     public static List<ImageZone> decoupeImage(BufferedImage X, int W, int n) {
         List<ImageZone> zones = new ArrayList<>();
         int width = X.getWidth();
@@ -120,7 +151,12 @@ public class ImageUtils {
 
         return zones;
     }
-    
+
+    /**
+     * Vectorise patchs
+     * @param patches is a list of patchs
+     * @return A List of VectorWithPosition
+     */
     public static List<VectorWithPosition> VectorPatchs(List<Patch> patches) {
         List<VectorWithPosition> result = new ArrayList<>();
 
@@ -131,6 +167,12 @@ public class ImageUtils {
         return result;
     }
     
+    /**
+     * Calculate MSE between two images, pixel by pixel
+     * @param img1 a BufferedImage
+     * @param img2 a BufferedImage
+     * @return float MSE
+     */
     public static double computeMSE(BufferedImage img1, BufferedImage img2) {
         int width = img1.getWidth();
         int height = img1.getHeight();
@@ -149,9 +191,14 @@ public class ImageUtils {
         return mse;
     }
     
+    /**
+     * Camculate PSNR between two images, pixel by pixel
+     * @param mse aka mean squared error from the same case
+     * @return Float psnr
+     */
     public static double computePSNR(double mse) {
         if (mse == 0) {
-            return Double.POSITIVE_INFINITY; // Images identiques
+            return Double.POSITIVE_INFINITY; // Same images
         }
         return 10 * Math.log10((255 * 255) / mse);
     }

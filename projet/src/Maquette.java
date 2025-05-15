@@ -11,21 +11,64 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * Use to create HMI for the application
+ */
 public class Maquette extends Application {
-	
+	/**
+     * Is the path of original image
+     */
 	private String pathOriginal;
+    /**
+     * Is the path of image with noise
+     */
 	private String pathNoisy;
+    /**
+     * Is the path of denoised image
+     */
 	private String pathDenoised;
+    /**
+     * Is the image with noise
+     */
 	private ImageView imageBruitee;
+    /**
+     * Is the denoised image
+     */
 	private ImageView imageDebruitee;
+    /**
+     * ???
+     */
 	private Label placeholderLabelBruitee;
+    /**
+     * ???
+     */
 	private Label placeholderLabelDebruitee;
+    /**
+     * Is the width of a patch
+     */
 	private int patchs;
+    /**
+     * Is a constant which defines the noise
+     */
 	private int sigma;
+    /**
+     * Label which conatins ???
+     */
 	private Label bruiteeLabel;
+    /**
+     * Label which contains ???
+     */
 	private Label debruiteeLabel;
+    /**
+     * HBox which contains ???
+     */
 	private HBox metricsBox;
 
+
+    /**
+     * Use to start and build the app
+     * @param primaryStage is where the scene graph is set
+     */
     @Override
     public void start(Stage primaryStage) {
         BorderPane mainContainer = new BorderPane();
@@ -178,6 +221,12 @@ public class Maquette extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Create a group of parameters in a Vbox 
+     * @param labelText is the string which will be insert in the Label
+     * @param control ???
+     * @return a VBow which contains the label with parameters
+     */
     private VBox createParamGroup(String labelText, Control control) {
         Label label = new Label(labelText);
         label.setStyle("-fx-font-weight: bold; -fx-text-fill: #444;");
@@ -185,6 +234,13 @@ public class Maquette extends Application {
         return box;
     }
 
+    /**
+     * Create a group of parameters in a Vbox 
+     * @param labelText is the string which will be insert in the Label
+     * @param slider is a Slider which will be add in the VBox
+     * @param valueLabel is a Label which will be add in the VBox
+     * @return a VBow which contains the label, the slider with parameters
+     */
     private VBox createParamGroup(String labelText, Slider slider, Label valueLabel) {
         VBox box = createParamGroup(labelText, slider);
         valueLabel.setStyle("-fx-text-fill: #616161;");
@@ -193,6 +249,12 @@ public class Maquette extends Application {
         return box;
     }
     
+    /**
+     * Use to create a box which contains an image, it label and a button with a assigned event
+     * @param defaultText is a text which will be add in a Label as default
+     * @param caption is a string which will be add in a Label
+     * @return VBox which conatins an image container, a button and a caption label
+     */
     private VBox createImageBoxImportable(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -238,6 +300,12 @@ public class Maquette extends Application {
         return box;
     }
     
+    /**
+     * Use to create a box which contains an image, it label in order to print the noised image 
+     * @param defaultText is a text which will be add in a Label as default
+     * @param caption is a string which will be add in a Label
+     * @return VBox which conatins an image container and  a caption label
+     */
     private VBox createDynamicImageBoxNoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -269,6 +337,12 @@ public class Maquette extends Application {
         return box;
     }
     
+    /**
+     * Use to create a box which contains an image, it label in order to print the denoised image 
+     * @param defaultText is a text which will be add in a Label as default
+     * @param caption is a string which will be add in a Label
+     * @return VBox which conatins an image container and  a caption label
+     */
     private VBox createDynamicImageBoxDenoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -321,6 +395,12 @@ public class Maquette extends Application {
         return box;
     }*/
 
+    /**
+    * ???
+    * @param value ???
+    * @param label ???
+    * @return VBow which contains ??? 
+    */
     private VBox createMetricBox(double value, String label) {
         Label valueLabel = new Label();
         valueLabel.setText(String.format("%.2f", value));
@@ -336,7 +416,10 @@ public class Maquette extends Application {
 
     
     
-
+    /**
+     * Use to launch the app
+     * @param args is a string tabular which contains arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }

@@ -9,11 +9,29 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 public class Main {
-	
+    /**
+     * Default constructor
+     */
+    public Main(){}
+
+	/**
+     * Static attribut which contains mse's value
+     */
 	public static double mse;
+    /**
+     * Static attribut which contains psnr's value
+     */
 	public static double psnr;
+    /**
+     * Static attribut which contains value of enhancement
+     */
 	public static double amelioration;
 
+    /**
+     * Load image and apply noise on it
+     * @param path is the path of source folder 
+     * @param sigma is a constant which defines the noise
+     */
     public static void bruitage(String path, int sigma) throws Exception {
     	// Charger l’image propre (grayscale)
         BufferedImage original = loadImage(path);
@@ -27,6 +45,16 @@ public class Main {
         System.out.println("Image bruitée sauvegardée.");
     }
     
+    /**
+     * Apply denoising on the image loaded previously with the method which is define by methode's arguments
+     * @param pathOriginal is the path of the original image
+     * @param pathNoisy is the path of the image with noise
+     * @param sigma is a constant which defines the noise
+     * @param patchs is the patch's width
+     * @param extractionType is the type of patchs' extraction 
+     * @param seuillageMethod is the type of thresholding
+     * @param seuilType is the type of threshold
+     */
     public static void debruitage(String pathOriginal, String pathNoisy, int sigma, int patchs, String extractionType, String seuillageMethod, String seuilType) throws Exception {
     	BufferedImage original = ImageIO.read(new File(pathOriginal));
     	BufferedImage noisy = ImageIO.read(new File(pathNoisy));
@@ -111,16 +139,26 @@ public class Main {
         System.out.println("Traitement terminé pour sigma = " + sigma + " et patchs = " + patchs + "x" + patchs);
     }
 
+    /**
+     * load an image from the path
+     * @param path aka the locating of destination file
+     * @return return the image as a BufferedImage
+     */
     public static BufferedImage loadImage(String path) throws Exception {
     	System.out.println(path);
         BufferedImage original = ImageIO.read(new File(path));
 
-        // Convertir en niveaux de gris si ce n'est pas déjà le cas
+        // Convert in a greyscale if not
         BufferedImage gray = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         gray.getGraphics().drawImage(original, 0, 0, null);
         return gray;
     }
 
+    /**
+     * Save the image in the selected file
+     * @param img a BufferedImage
+     * @param path aka the locating of destination file
+     */
     public static void saveImage(BufferedImage img, String path) throws Exception {
         File output = new File(path);
         ImageIO.write(img, "jpeg", output);
