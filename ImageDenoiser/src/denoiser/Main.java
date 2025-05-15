@@ -12,11 +12,28 @@ import javax.imageio.ImageIO;
 public class Main {
     public static void main(String[] args) {
         try {
+        	// Lecture des paramètres -in et -sigma
+        	String imagePath = null;
+        	double sigma = 0;
+
+        	for (int i = 0; i < args.length; i++) {
+        	    if ("-in".equals(args[i]) && i + 1 < args.length) {
+        	        imagePath = args[++i];
+        	    } else if ("-sigma".equals(args[i]) && i + 1 < args.length) {
+        	        sigma = Double.parseDouble(args[++i]);
+        	    }
+        	}
+
+        	if (imagePath == null || sigma <= 0) {
+        	    System.err.println("Utilisation : java -jar ACPDenoiser.jar -in <imagePath> -sigma <valeur>");
+        	    System.exit(1);
+        	}
+           	
+        	
             // 1. Chargement de l'image originale
             BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
 
             // 2. Ajout de bruit
-            double sigma = 25.0;
             BufferedImage noisy = ImageUtils.noising(original, sigma);
             saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
