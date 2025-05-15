@@ -31,7 +31,7 @@ public class Main {
            	
         	
             // 1. Chargement de l'image originale
-            BufferedImage original = loadImage("images_sources/lena.jpeg");
+            BufferedImage original = loadImage(imagePath);
 
             // 2. Ajout de bruit
             BufferedImage noisy = ImageUtils.noising(original, sigma);
