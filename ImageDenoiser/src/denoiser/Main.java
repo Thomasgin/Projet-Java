@@ -38,7 +38,7 @@ public class Main {
             saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
             localDenoising(8, sigma, noisy, original);
-           
+            globalDenoising(8, sigma, noisy, original);
 
         } catch (Exception e) {
             System.err.println("Erreur lors du traitement : " + e.getMessage());
