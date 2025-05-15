@@ -41,14 +41,16 @@ public class ImageUtils {
 
         int width = X.getWidth();
         int height = X.getHeight();
-        int offset = s / 2;
+        int half = s / 2;
+        int start = (s % 2 == 0) ? -half : -half;
+        int end   = (s % 2 == 0) ? half - 1 : half;
 
-        for (int y = offset; y < height - offset; y++) {
-            for (int x = offset; x < width - offset; x++) {
+        for (int y = half; y < height - half; y++) {
+            for (int x = half; x < width - half; x++) {
                 double[] patchData = new double[s * s];
                 int idx = 0;
-                for (int dy = -offset; dy <= offset; dy++) {
-                    for (int dx = -offset; dx <= offset; dx++) {
+                for (int dy = start; dy <= end; dy++) {
+                    for (int dx = start; dx <= end; dx++) {
                         int val = raster.getSample(x + dx, y + dy, 0);
                         patchData[idx++] = val;
                     }
@@ -65,7 +67,9 @@ public class ImageUtils {
         int[][] count = new int[height][width];
 
         int patchSize = (int) Math.sqrt(patches.get(0).data.length);
-        int offset = patchSize / 2;
+        int half = patchSize / 2;
+        int start = (patchSize % 2 == 0) ? -half : -half;
+        int end   = (patchSize % 2 == 0) ? half - 1 : half;
 
         for (Patch patch : patches) {
             double[] data = patch.data;
@@ -73,8 +77,8 @@ public class ImageUtils {
             int y0 = patch.positionY;
 
             int idx = 0;
-            for (int dy = -offset; dy <= offset; dy++) {
-                for (int dx = -offset; dx <= offset; dx++) {
+            for (int dy = start; dy <= end; dy++) {
+                for (int dx = start; dx <= end; dx++) {
                     int x = x0 + dx;
                     int y = y0 + dy;
 
@@ -86,6 +90,7 @@ public class ImageUtils {
                 }
             }
         }
+
 
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
         WritableRaster raster = result.getRaster();
@@ -108,13 +113,25 @@ public class ImageUtils {
 
         for (int y = 0; y <= height - W; y += n) {
             for (int x = 0; x <= width - W; x += n) {
-                BufferedImage subImage = X.getSubimage(x, y, W, W);
+                BufferedImage subImage = new BufferedImage(W, W, BufferedImage.TYPE_BYTE_GRAY);
+                WritableRaster subRaster = subImage.getRaster();
+                Raster originalRaster = X.getRaster();
+
+                for (int j = 0; j < W; j++) {
+                    for (int i = 0; i < W; i++) {
+                        int val = originalRaster.getSample(x + i, y + j, 0);
+                        subRaster.setSample(i, j, 0, val);
+                    }
+                }
+
                 zones.add(new ImageZone(subImage, x, y));
             }
         }
 
         return zones;
     }
+
+
     
     public static List<VectorWithPosition> VectorPatchs(List<Patch> patches) {
         List<VectorWithPosition> result = new ArrayList<>();
@@ -125,6 +142,51 @@ public class ImageUtils {
 
         return result;
     }
+    
+    public static BufferedImage recomposeFromZones(List<ImageZone> zones, int fullWidth, int fullHeight) {
+        int[][] sum = new int[fullHeight][fullWidth];
+        int[][] count = new int[fullHeight][fullWidth];
+
+        for (ImageZone zone : zones) {
+            BufferedImage img = zone.getImage();
+            Raster raster = img.getRaster();
+            int[] pos = zone.getPosition();
+            int offsetX = pos[0];
+            int offsetY = pos[1];
+
+            int w = img.getWidth();
+            int h = img.getHeight();
+
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    int val = raster.getSample(x, y, 0);
+                    int globalX = offsetX + x;
+                    int globalY = offsetY + y;
+
+                    if (globalX < fullWidth && globalY < fullHeight) {
+                        sum[globalY][globalX] += val;
+                        count[globalY][globalX]++;
+                    }
+                }
+            }
+        }
+
+        BufferedImage result = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_BYTE_GRAY);
+        WritableRaster resultRaster = result.getRaster();
+
+        for (int y = 0; y < fullHeight; y++) {
+            for (int x = 0; x < fullWidth; x++) {
+                int val = (count[y][x] == 0) ? 0 : (sum[y][x] / count[y][x]);
+                resultRaster.setSample(x, y, 0, val);
+            }
+        }
+
+        result.setData(resultRaster);
+        return result;
+    }
+
+
+
 
 
 
