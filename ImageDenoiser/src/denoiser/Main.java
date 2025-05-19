@@ -13,14 +13,14 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. Chargement de l'image originale
-            BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
+            BufferedImage original = loadImage("ImageDenoiser/images_sources/image.jpeg");
 
             // 2. Ajout de bruit
-            double sigma = 25.0;
+            double sigma = 20.0;
             BufferedImage noisy = ImageUtils.noising(original, sigma);
-            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
+            saveImage(noisy, "ImageDenoiser/images_bruitees/image_noisy_sigma" + (int) sigma + ".jpeg");
 
-            localDenoising(8, sigma, noisy, original);
+            localDenoising(9, sigma, noisy, original);
            
 
         } catch (Exception e) {
@@ -105,12 +105,20 @@ public class Main {
     }
     
     public static void localDenoising(int s, double sigma, BufferedImage noisy, BufferedImage original) throws IOException {
-        int W = 64;
-        int pas = 64;
+        int height = noisy.getHeight();
+        int width = noisy.getWidth();
 
+        int minDim = Math.min(width, height);
+
+        // Taille des sous-images = moitié de la plus petite dimension
+        int W = minDim / 2;
+        // Pas = W / 2 = 1/4 de la dimension
+        int pas = W / 2;
+
+        System.out.println("Taille image : " + width + "x" + height + ", W = " + W + ", pas = " + pas);
+        
         List<ImageZone> zones = ImageUtils.decoupeImage(noisy, W, pas);
 
-        // Préparation des listes pour les 4 méthodes
         List<List<ImageZone>> zonesParMethode = new ArrayList<>();
         for (int i = 0; i < 4; i++) zonesParMethode.add(new ArrayList<>());
 
@@ -123,7 +131,6 @@ public class Main {
             int offsetX = zone.getPosition()[0];
             int offsetY = zone.getPosition()[1];
 
-            // Pipeline
             List<Patch> patches = ImageUtils.extractPatches(subImage, s);
             List<double[]> vectors = patches.stream().map(Patch::toVector).toList();
             ACPResult acpResult = ACP.computeACP(vectors);
@@ -155,10 +162,8 @@ public class Main {
             }
         }
 
-        // Recomposition, sauvegarde et évaluation
         String sigmaDir = "ImageDenoiser/images_reconstruites/sigma" + (int) sigma + "/";
         new File(sigmaDir).mkdirs();
-
         FileWriter fw = new FileWriter(sigmaDir + "resultats_local.txt");
         PrintWriter pw = new PrintWriter(fw);
 
@@ -177,6 +182,7 @@ public class Main {
         pw.close();
         System.out.println("Traitement local terminé pour sigma = " + sigma + ".");
     }
+
 
 
 

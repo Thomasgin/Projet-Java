@@ -1,0 +1,4 @@
+BayesSoft : MSE = 609,37, PSNR = 20,28 dB
+BayesHard : MSE = 674,62, PSNR = 19,84 dB
+VisuSoft : MSE = 617,64, PSNR = 20,22 dB
+VisuHard : MSE = 573,69, PSNR = 20,54 dB

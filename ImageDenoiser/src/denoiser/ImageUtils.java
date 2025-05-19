@@ -106,30 +106,47 @@ public class ImageUtils {
         return result;
     }
     
-    public static List<ImageZone> decoupeImage(BufferedImage X, int W, int n) {
+    public static List<ImageZone> decoupeImage(BufferedImage image, int W, int pas) {
         List<ImageZone> zones = new ArrayList<>();
-        int width = X.getWidth();
-        int height = X.getHeight();
 
-        for (int y = 0; y <= height - W; y += n) {
-            for (int x = 0; x <= width - W; x += n) {
-                BufferedImage subImage = new BufferedImage(W, W, BufferedImage.TYPE_BYTE_GRAY);
-                WritableRaster subRaster = subImage.getRaster();
-                Raster originalRaster = X.getRaster();
+        int width = image.getWidth();
+        int height = image.getHeight();
 
-                for (int j = 0; j < W; j++) {
-                    for (int i = 0; i < W; i++) {
-                        int val = originalRaster.getSample(x + i, y + j, 0);
-                        subRaster.setSample(i, j, 0, val);
-                    }
-                }
-
-                zones.add(new ImageZone(subImage, x, y));
+        for (int y = 0; y <= height - W; y += pas) {
+            for (int x = 0; x <= width - W; x += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
             }
+        }
+
+        // Ajout des zones de bordures droites (si image non divisible)
+        if ((width - W) % pas != 0) {
+            int x = width - W;
+            for (int y = 0; y <= height - W; y += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
+            }
+        }
+
+        if ((height - W) % pas != 0) {
+            int y = height - W;
+            for (int x = 0; x <= width - W; x += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
+            }
+        }
+
+        // Coin bas droit si nécessaire
+        if ((width - W) % pas != 0 && (height - W) % pas != 0) {
+            BufferedImage sub = image.getSubimage(width - W, height - W, W, W);
+            zones.add(new ImageZone(sub, width - W, height - W));
         }
 
         return zones;
     }
+
+
+
 
 
     
@@ -143,47 +160,39 @@ public class ImageUtils {
         return result;
     }
     
-    public static BufferedImage recomposeFromZones(List<ImageZone> zones, int fullWidth, int fullHeight) {
-        int[][] sum = new int[fullHeight][fullWidth];
-        int[][] count = new int[fullHeight][fullWidth];
+    public static BufferedImage recomposeFromZones(List<ImageZone> zones, int width, int height) {
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        WritableRaster raster = result.getRaster();
+
+        double[][] sum = new double[height][width];
+        int[][] count = new int[height][width];
 
         for (ImageZone zone : zones) {
             BufferedImage img = zone.getImage();
-            Raster raster = img.getRaster();
-            int[] pos = zone.getPosition();
-            int offsetX = pos[0];
-            int offsetY = pos[1];
+            int offsetX = zone.getPosition()[0];
+            int offsetY = zone.getPosition()[1];
+            Raster zoneRaster = img.getRaster();
 
-            int w = img.getWidth();
-            int h = img.getHeight();
-
-            for (int y = 0; y < h; y++) {
-                for (int x = 0; x < w; x++) {
-                    int val = raster.getSample(x, y, 0);
-                    int globalX = offsetX + x;
-                    int globalY = offsetY + y;
-
-                    if (globalX < fullWidth && globalY < fullHeight) {
-                        sum[globalY][globalX] += val;
-                        count[globalY][globalX]++;
-                    }
+            for (int y = 0; y < img.getHeight(); y++) {
+                for (int x = 0; x < img.getWidth(); x++) {
+                    int val = zoneRaster.getSample(x, y, 0);
+                    sum[offsetY + y][offsetX + x] += val;
+                    count[offsetY + y][offsetX + x]++;
                 }
             }
         }
 
-        BufferedImage result = new BufferedImage(fullWidth, fullHeight, BufferedImage.TYPE_BYTE_GRAY);
-        WritableRaster resultRaster = result.getRaster();
-
-        for (int y = 0; y < fullHeight; y++) {
-            for (int x = 0; x < fullWidth; x++) {
-                int val = (count[y][x] == 0) ? 0 : (sum[y][x] / count[y][x]);
-                resultRaster.setSample(x, y, 0, val);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int val = (count[y][x] > 0) ? (int) Math.round(sum[y][x] / count[y][x]) : 0;
+                raster.setSample(x, y, 0, Math.max(0, Math.min(255, val)));
             }
         }
 
-        result.setData(resultRaster);
+        result.setData(raster);
         return result;
     }
+
 
 
 
