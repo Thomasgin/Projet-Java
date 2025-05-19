@@ -21,21 +21,21 @@
   \datalist[entry]{nyt/global//global/global}
     \entry{debruitage}{misc}{}
       \name{author}{1}{}{%
-        {{hash=f60796aa22e0392140e824d95a7f5b44}{%
-           family={CAMDAVANT},
-           familyi={C\bibinitperiod},
-           given={Nisrine\bibnamedelima FORTIN},
-           giveni={N\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=2f0dfabca74bc965251d3e645c917dbf}{%
+           family={FORTIN\bibnamedelima CAMDAVANT},
+           familyi={F\bibinitperiod\bibinitdelim C\bibinitperiod},
+           given={Nisrine},
+           giveni={N\bibinitperiod}}}%
       }
-      \strng{namehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{fullhash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{bibnamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authorbibnamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authornamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authorfullhash}{f60796aa22e0392140e824d95a7f5b44}
+      \strng{namehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{fullhash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{bibnamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authorbibnamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authornamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authorfullhash}{2f0dfabca74bc965251d3e645c917dbf}
       \field{extraname}{1}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{Document interne fourni en préambule du projet}
@@ -45,21 +45,21 @@
     \endentry
     \entry{saeMethode}{misc}{}
       \name{author}{1}{}{%
-        {{hash=f60796aa22e0392140e824d95a7f5b44}{%
-           family={CAMDAVANT},
-           familyi={C\bibinitperiod},
-           given={Nisrine\bibnamedelima FORTIN},
-           giveni={N\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=2f0dfabca74bc965251d3e645c917dbf}{%
+           family={FORTIN\bibnamedelima CAMDAVANT},
+           familyi={F\bibinitperiod\bibinitdelim C\bibinitperiod},
+           given={Nisrine},
+           giveni={N\bibinitperiod}}}%
       }
-      \strng{namehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{fullhash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{bibnamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authorbibnamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authornamehash}{f60796aa22e0392140e824d95a7f5b44}
-      \strng{authorfullhash}{f60796aa22e0392140e824d95a7f5b44}
+      \strng{namehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{fullhash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{bibnamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authorbibnamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authornamehash}{2f0dfabca74bc965251d3e645c917dbf}
+      \strng{authorfullhash}{2f0dfabca74bc965251d3e645c917dbf}
       \field{extraname}{2}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{Document interne fourni en préambule du projet}
@@ -68,27 +68,71 @@
       \true{nocite}
     \endentry
     \entry{sae}{misc}{}
-      \name{author}{1}{}{%
-        {{hash=b8d6c38fc882aa32f4ff5ef9e3bc6c11}{%
-           family={Nisrine\bibnamedelimb FORTIN\bibnamedelima CAMDAVANT},
-           familyi={N\bibinitperiod\bibinitdelim F\bibinitperiod\bibinitdelim C\bibinitperiod},
-           given={Elisabeth\bibnamedelima RANISAVLJEVIC},
-           giveni={E\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      \name{author}{2}{}{%
+        {{hash=2f0dfabca74bc965251d3e645c917dbf}{%
+           family={FORTIN\bibnamedelima CAMDAVANT},
+           familyi={F\bibinitperiod\bibinitdelim C\bibinitperiod},
+           given={Nisrine},
+           giveni={N\bibinitperiod}}}%
+        {{hash=dfc3d8f25efc6c3160821c9440cec4d4}{%
+           family={RANISAVLJEVIC},
+           familyi={R\bibinitperiod},
+           given={Elisabeth},
+           giveni={E\bibinitperiod}}}%
       }
-      \strng{namehash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \strng{fullhash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \strng{bibnamehash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \strng{authorbibnamehash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \strng{authornamehash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \strng{authorfullhash}{b8d6c38fc882aa32f4ff5ef9e3bc6c11}
-      \field{sortinit}{N}
-      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \strng{namehash}{b50a3301e8023ec94638cb4713fd1183}
+      \strng{fullhash}{b50a3301e8023ec94638cb4713fd1183}
+      \strng{bibnamehash}{b50a3301e8023ec94638cb4713fd1183}
+      \strng{authorbibnamehash}{b50a3301e8023ec94638cb4713fd1183}
+      \strng{authornamehash}{b50a3301e8023ec94638cb4713fd1183}
+      \strng{authorfullhash}{b50a3301e8023ec94638cb4713fd1183}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{Document interne fourni en préambule du projet}
       \field{title}{Présentation de la SAE}
       \field{year}{2025}
       \true{nocite}
+    \endentry
+    \entry{origineBruit}{article}{}
+      \name{author}{2}{}{%
+        {{hash=ae8a266256b176daf29f0434cacbbd31}{%
+           family={MAYASARI},
+           familyi={M\bibinitperiod},
+           given={Rini},
+           giveni={R\bibinitperiod}}}%
+        {{hash=7207e0672395182446ca69703c76367f}{%
+           family={HERYANA},
+           familyi={H\bibinitperiod},
+           given={Nono},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{a0295f0166bae8efdfb828598a3200e6}
+      \strng{fullhash}{a0295f0166bae8efdfb828598a3200e6}
+      \strng{bibnamehash}{a0295f0166bae8efdfb828598a3200e6}
+      \strng{authorbibnamehash}{a0295f0166bae8efdfb828598a3200e6}
+      \strng{authornamehash}{a0295f0166bae8efdfb828598a3200e6}
+      \strng{authorfullhash}{a0295f0166bae8efdfb828598a3200e6}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2394-2231}
+      \field{journaltitle}{International Journal of Computer Techniques}
+      \field{number}{1}
+      \field{title}{Reduce Noise in Computed Tomography Image using Adaptive Gaussian Filter}
+      \field{volume}{6}
+      \field{year}{2019}
+      \true{nocite}
+      \field{pages}{17\bibrangedash 20}
+      \range{pages}{4}
+      \verb{urlraw}
+      \verb https://arxiv.org/pdf/1902.05985
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/pdf/1902.05985
+      \endverb
     \endentry
   \enddatalist
 \endrefsection

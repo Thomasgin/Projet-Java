@@ -1,12 +1,15 @@
 \section{Introduction} 
 
-contexte du projet en 1 ou 2 paragraphe
+% Contexte
+Lorsque l'on souhaite capturer une image, on le fait à l'aide de capteurs (photodiode, CMOS/CCD). Ces capteurs sont sensibles aux bruits qui peut provenir de plusieurs source : arrondi de conversion, interférences électromagnétiques, agitations des électrons. \par
+On retrouve ce bruit dans la photographie numérique, l'imagerie médical ainsi que dans la transmitions d'image.
 
-\paragraph{Problématique}
-expliquer la Problématique
+% Problématique
+Un des problème majeur du bruit sur les images est la dégradation des images médicales car elles doivent être analysées avec précisions. \par
+Il est alors nécessaire d'identifier le bruit sur l'image et de l'éliminer afin de gagner en qualité sur celle-ci afin que l'on puisse observer les détails sur l'image.
 
-\paragraph{Objectifs}
-expliquer les Objectifs
+% Objectifs
+Dans ce projet, nous ne travaillerons que sur du bruit de type gaussien. Nous tenterons, grace à différentes méthode et l'algorithme de l'ACP, de trouver une méthode optimale afin de débruiter le plus efficacement une image.
 
-\paragraph{Organisation}
-expliquer l'organisation et le déroulé du rapport
+% Organisation
+Dans ce rapport, nous expliquerons la méthode mathématiques que nous allons utiliser pour débruiter l'image ainsi que l'implémentation d'une interface homme-machine (IHM). Nous analyserons ensuites les résultats obtenus selon le type de débruitage que nous appliquerons afin de déterminer une méthode optimal pour débruiter une image.

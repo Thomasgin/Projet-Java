@@ -1,7 +1,4 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {paragraph}{Problématique}{2}{section*.2}%
-\contentsline {paragraph}{Objectifs}{2}{section*.3}%
-\contentsline {paragraph}{Organisation}{2}{section*.4}%
 \contentsline {section}{\numberline {2}Réponses au problème}{3}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Approche mathématiques}{3}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Approche informatique}{3}{subsection.2.2}%
