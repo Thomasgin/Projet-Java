@@ -1,0 +1,29 @@
+On notera ici \(u\) un vecteur et \(u^{\top}\)
+Soit \(\beta = \{u_{1}, \ldots, u_{s^{2}}\}\) une base orthonormée de \(\mathbb{R}^{s^{2}}\).
+
+Soit \(x = V(k) - m(v) \in \mathbb{R}^{s^{2}}\).
+
+On a :
+\[
+x = \sum_{i=1}^{s^{2}} \beta_{i} u_{i}
+\]
+
+De plus :
+\[
+\langle x \mid u_{j} \rangle = \left\langle \sum_{i=1}^{s^{2}} \beta_{i} u_{i} \big{|} u_{j} \right\rangle = \sum_{i=1}^{s^{2}} \beta_{i} \langle u_{i} \mid u_{j} \rangle = \beta_{j} \langle u_{j} \mid u_{j} \rangle = \beta_{j}
+\]
+
+Donc :
+\[
+\beta_{i} = \langle x \mid u_{i} \rangle
+\]
+
+Ainsi :
+\[
+V(k) - m(v) = \sum_{i=1}^{s^{2}} \langle V(k) - m(v) \mid u_{i} \rangle \, u_{i} = \sum_{i=1}^{s^{2}} u_{i}^{\top} \left( V(k) - m(v) \right) u_{i}
+\]
+
+Finalement :
+\[
+V(k) = m(v) + \sum_{i=1}^{s^{2}} u_{i}^{\top} \left( V(k) - m(v) \right) u_{i}
+\]

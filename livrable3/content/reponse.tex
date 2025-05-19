@@ -1,10 +1,21 @@
 \section{Réponses au problème}
 
 \subsection{Approche mathématiques}
-Expliquer en quoi l'ACP va nous servir 
+\subsubsection{Préambule}
+Pour commencer nos explications, nous allons démontrer que l'on peut décomposer un vecteur \(V\) correspondant à un patch dans une base orthonormée.\newline
+\begin{figure}[hbt!]
+    \input{reference/maths/demoMaths.tex}
+    \caption{Démonstration de la décomposition de V dans une base orthonormée}
+\end{figure}
+
+\subsection{Transformation du problème en mathématiques}
+Tout d'abord, l'objectifs du débruitage est de travailler sur des patchs qui sont des petits carrées de pixels extraient de l'image. Nous allons représenter ces patchs en noir et blanc comme un vecteur dont le valeurs sont dans \([0,255]\). Les s pixels de la première ligne seront les s premiers du vecteurs, ainsi de suite. \par
+Nous allons ensuite faire ressortir le bruit à l'aide de l'ACP appliqué sur ces vecteurs. L'ACP va dé-corréler les variables, ce qui va centrer les variables importantes, et rendre abérantes les varibales de bruits. \par
+En appliquants un seuillage avec une valeur seuil, nous pourrons supprimer les variables abérantes, et donc supprimer le bruit.
 
 \subsection{Approche informatique}
-Expliquer comment nous avons implémenter l'approche mathématiques en Java
+Comme demandé, notre application permettant de répondre à cette problématique de bruitage est développé en Java et l'interface graphique à l'aide de JavaFX. \par
+Pour ce qui est de la structure du code, nous avons divisé le problème en plusieurs classes
 
 \subsection{Choix initiaux}
 Justifier notre livrable 1 et dire ce que nous avons changé
