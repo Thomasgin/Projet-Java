@@ -1,0 +1,30 @@
+\newcommand{\ABS}[1]{\LR{|}{#1}{|}}                         % mathmode              : absolute value
+\newcommand{\BAR}[1]{\overline{#1}}                         % mathmode              : a bar above a letter
+\newcommand{\BBR}[1]{\LR{\{}{#1}{\}}}                       % mathmode              : between brackets
+\newcommand{\BLR}[3]{\left#1 #2 \right#3}                   % mathmode              : between left right
+\newcommand{\CAL}[1]{\mathcal{#1}}                          % mathmode {amssymb}    : caligraphic letter
+\newcommand{\COV}[1]{\text{Cov}\LR{(}{#1}{)}}               % mathmode {amsmath}    : covariance 
+\newcommand{\DIS}{\displaystyle}                            % mathmode              : displaystyle
+\newcommand{\EPS}{\varepsilon}                              % mathmode {amsmath}    : epsilon
+\newcommand{\EQU}{\Leftrightarrow}                          % mathmode              : equivalent arrow
+\newcommand{\ESL}[1]{\mathscr{#1}}                          % mathmode {amssymb}    : elegant script letter
+\newcommand{\EXP}[1]{\exp\LR{(}{#1}{)}}                     % mathmode {IDK}        : exponential
+\newcommand{\FAM}[2]{\LR{(}{#1}{)}_{#2}}                    % mathmode              : family
+\newcommand{\IINT}[2]{\iint_{#1}^{#2}}                      % mathmode              : double integral
+\newcommand{\IND}{\perp \!\!\! \perp}                       % mathmode              : independant symbol
+\newcommand{\IDC}[1]{\mathds{1}_{#1}}                       % mathmode {dsfont}     : indicator function
+\newcommand{\INT}[2]{\int_{#1}^{#2}}                        % mathmode              : integral
+\newcommand{\LIM}[1]{\underset{#1}{\text{lim}}}             % mathmode              : limit
+\newcommand{\MAX}[1]{\underset{#1}{\text{max}}}             % mathmode              : max
+\newcommand{\MIN}[1]{\underset{#1}{\text{min}}}             % mathmode              : min
+\newcommand{\PTD}{\partial}                                 % mathmode              : partial derivate symbol
+\newcommand{\RML}[1]{\mathrm{#1}}                           % mathmode {amssymb}    : roman letter
+\newcommand{\SET}[1]{\mathbb{#1}}                           % mathmode {amssymb}    : set
+\newcommand{\SETBT}[3]{\mathbb{#1}_{#2}^{#3}}               % mathmode {amssymb}    : set + bot and top 
+\newcommand{\SUM}[2]{\sum_{#1}^{#2}}                        % mathmode              : sum
+\newcommand{\TEN}[2]{\underset{#2}{\xrightarrow{#1}}}       % mathmode              : tend to
+\newcommand{\TXT}[1]{\;\text{#1}\;}                         % mathmode {amsmath}    : insert text in math mode
+\newcommand{\VEC}[1]{\overrightarrow{#1}}                   % mathmode              : vector
+
+% Create a system with an #1 lines and arguments around it and possible commentary on right side
+\newenvironment{SYSTEM}[1]{\begin{array}{r @{\quad #1 \quad} l l}}{\end{array}}
