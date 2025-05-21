@@ -33,13 +33,13 @@ public class Main {
      * @param sigma is a constant which defines the noise
      */
     public static void bruitage(String path, int sigma) throws Exception {
-    	// Charger l’image propre (grayscale)
+    	// LOad clear image (grayscale)
         BufferedImage original = loadImage(path);
 
-        // Appliquer le bruit gaussien
+        // Apply gaussian noise
         BufferedImage noisy = ImageUtils.noising(original, sigma);
 
-        // Sauvegarder l’image bruitée
+        // Save noised image
         saveImage(noisy, "images/bruitees/image_noisy_sigma" + sigma + ".jpeg");
 
         System.out.println("Image bruitée sauvegardée.");
@@ -59,12 +59,12 @@ public class Main {
     	BufferedImage original = ImageIO.read(new File(pathOriginal));
     	BufferedImage noisy = ImageIO.read(new File(pathNoisy));
     	
-    	// 3. Extraction des patchs
+    	// 3. Extract patchs
     	System.out.println(patchs);
     	System.out.println(pathNoisy);
         List<Patch> patches = ImageUtils.extractPatches(noisy, patchs);
 
-        // 4. Conversion en vecteurs
+        // 4. Convert in vector
         List<double[]> vectors = patches.stream()
                                         .map(Patch::toVector)
                                         .toList();
@@ -76,11 +76,11 @@ public class Main {
         List<double[]> Vc = ACP.MoyCov(vectors).Vc;
         double[][] contributions = ACP.project(acpResult.base, Vc);
 
-        // 7. Dossier de sortie pour sigma
+        // 7. Output folder for sigma
        // File dir = new File(sigmaDir);
        // if (!dir.exists()) dir.mkdirs();
 
-        // 8. Écriture du fichier résultats
+        // 8. Writing of result file
         FileWriter fw = new FileWriter("images/results/resultats.txt");
         PrintWriter pw = new PrintWriter(fw);
 
@@ -93,7 +93,7 @@ public class Main {
             boolean isSoft = softFlags[i];
             boolean isBayes = bayesFlags[i];*/
 
-        // Calcul lambda
+        // calculate lambda
         double lambda;
         if (seuilType == "Bayésien") {
         	double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
@@ -102,7 +102,7 @@ public class Main {
             lambda = Thresholding.seuilVisu(sigma, patchs * patchs);
         }
 
-        // Seuillage
+        // Thresholding
         double[][] contributionsSeuillees;
         if (seuillageMethod == "Seuillage doux") {
         	contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, true);
@@ -110,7 +110,7 @@ public class Main {
         	contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, false);
         }
 
-        // Reconstruction
+        // Rebuilding
         List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
             contributionsSeuillees, acpResult.base, acpResult.moyenne);
 
@@ -155,9 +155,9 @@ public class Main {
     }
 
     /**
-     * Save the image in the selected file
+     * Save the image in the selected folder
      * @param img a BufferedImage
-     * @param path aka the locating of destination file
+     * @param path aka the locating of destination folder
      */
     public static void saveImage(BufferedImage img, String path) throws Exception {
         File output = new File(path);
