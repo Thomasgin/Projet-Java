@@ -13,14 +13,14 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. Chargement de l'image originale
-            BufferedImage original = loadImage("ImageDenoiser/images_sources/image.jpeg");
+            BufferedImage original = loadImage("ImageDenoiser/images_sources/lena.jpeg");
 
             // 2. Ajout de bruit
             double sigma = 20.0;
             BufferedImage noisy = ImageUtils.noising(original, sigma);
-            saveImage(noisy, "ImageDenoiser/images_bruitees/image_noisy_sigma" + (int) sigma + ".jpeg");
+            saveImage(noisy, "ImageDenoiser/images_bruitees/lena_noisy_sigma" + (int) sigma + ".jpeg");
 
-            localDenoising(9, sigma, noisy, original);
+            localDenoising(8, sigma, noisy, original);
            
 
         } catch (Exception e) {
