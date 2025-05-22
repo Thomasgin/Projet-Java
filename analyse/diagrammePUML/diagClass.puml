@@ -1,113 +1,125 @@
 @startuml
-title Diagramme de classes - Application de débruitage d'images
-
-class Image {
-  - bufferedImage: BufferedImage
-  - width: int
-  - height: int
-  + getBufferedImage(): BufferedImage
-  + getWidth(): int
-  + getHeight(): int
-  + load(path: String): void
-  + save(path: String): void
-  + extractPatches(s: int): PatchSet
-  + decoupe(W: int, n: int): List<ImageZone>
-  + applyNoise(sigma: double): Image
-  + reconstructFromPatches(p: PatchSet): Image
-}
-
-class Main {
-  + main(args: String[]): void
-}
-
-class Patch {
-  - data: double[][]
-  - positionX: int
-  - positionY: int
-  + toVector(): double[]
-  + fromVector(v: double[]): Patch
-}
-
-class PatchSet {
-  - patches: List<Patch>
-  - origine: String
-  + getPatches(): List<Patch>
-  + size(): int
-  + mean(): double[]
-  + covariance(): double[][]
-}
-
+left to right direction
+'### Classes principales ###
 class ACP {
-  - patchSet: PatchSet
-  + compute(): double[][]
-  + project(Vc: List<double[]>): double[][]
-}
-
-class Thresholding {
-  - patch: Patch
-  + visuThreshold(sigma: double, size: int): double
-  + bayesThreshold(sigma: double, sigmaSignal: double): double
-  + hard(lambda: double, x: double): double
-  + soft(lambda: double, x: double): double
+    {static} + __computeACP(V: List<double[]>__) : ACPResult
+    {static} + __MoyCov(V: List<double[]>__) : MoyCovResult
+    {static} + __project(U: double[][], Vc: List<double[]>__) : double[][]
 }
 
 class Evaluation {
-  - original: Image
-  - processed: Image
-  + mse(): double
-  + psnr(): double
+    {static} + __mse(original: BufferedImage, denoised: BufferedImage)__ : double
+    {static} + __psnr(mse: double)__ : double
+}
+
+class ImageUtils {
+    {static} + __noising(X0: BufferedImage, sigma: double)__ : BufferedImage
+    {static} + __extractPatches(X: BufferedImage, s: int)__ : List<Patch>
+    {static} + __reconstructPatches(patches: List<Patch>, height: int, width: int)__ : BufferedImage
+    {static} + __decoupeImage(X: BufferedImage, W: int, n: int)__ : List<ImageZone>
+    {static} + __VectorPatchs(patches: List<Patch>)__ : List<VectorWithPosition>
+    {static} + __computeMSE(img1: BufferedImage, img2: BufferedImage)__ : double
+    {static} + __computePSNR(mse: double)__ : double
+}
+
+class Maquette {
+    - pathOriginal: String
+    - pathNoisy : String
+    - pathDenoised : String
+    - imageBruitee: ImageView
+    - imageDebruitee : ImageView
+    - placeholderLabelBruitee: Label
+    - placeholderLabelDebruitee: Label
+    - patchs: int
+    - sigma: int
+    - bruiteeLabel: Label 
+    - debruiteeLabel : Label 
+    - metricsBox: Hbox
+    + start(primaryStage: Stage): void
+    - createParamGroup(labelText: String, control: Control): VBox
+    - createParamGroup(labelText: String, slider: Slider, valueLabel: Label): VBox
+    - createImageBoxImportable(defaultText: String, caption: String): VBox
+    - createDynamicImageBoxNoised(defaultText: String, caption: String): VBox
+    - createDynamicImageBoxDenoised(defaultText: String, caption: String): VBox
+    - createMetricBox(value: double, label: String): VBox
+    {static} + __main(args: String[])__ : void
+}
+
+class Patch {
+    - data: double[]
+    - positionX: int
+    - positionY: int
+    + Patch(data: double[], x: int, y: int)
+    + toVector(): double[]
+    {static} + __fromVector(v: double[], x: int, y: int)__ : Patch
+}
+
+class Tresholding {
+    {static} + __seuilVisu(sigma: double, size: int)__ : double
+    {static} + __seuilBayes(sigma: double, sigmaSignal: double)__ : double
+    {static} + __estimateGlobalSigmaSignal(contributions: double[][], sigma: double)__ : double
+    {static} + __soft(lambda: double, x: double)__ : double
+    {static} + __hard(lambda: double, x: double)__ : double
+    {static} + __appliquerSeuillage(contributions: double[][], lambda: double, isSoft: boolean)__ : double[][]
+    {static} + __reconstructionsDepuisContributions(contributions: List<double[]>)__ : List<double[]>
+}
+
+'### Classes de stockage ###
+class ACPResult {
+    + moyenne: double
+    + base: double[][]
+    + valeurs: double[]
 }
 
 class ImageZone {
-  - image: Image
-  - x: int
-  - y: int
-  + getImage(): Image
-  + getPosition(): (int, int)
+    - image: BufferedImage
+    - x: int
+    - y: int
+    + getImage(): BufferedImage
+    + getPosition(): int[]
 }
 
-class Interface {
-  - controller: Main
-  + displayImage(img: Image)
-  + displayResults(mse: double, psnr: double, gain: double)
-  + getParameters(): Parameters
-  + applyDenoising(): void
+class MoyCovResult {
+    + moyenne: double[]
+    + covariance: double[][]
+    + Vc: List<double[]>
 }
 
-class Parameters {
-  + sigma: double
-  + patchSize: int
-  + extractionMode: String
-  + thresholdType: String
-  + zoneSize: int
+class VectorWithPosition {
+    + vector : double[]
+    + x: int
+    + y: int
 }
 
-' Relations
-Main --> Interface
-Main --> Image
+'### Classe Main ###
+class Main {
+    + mse: double
+    + psnr: double
+    + amelioration: double
+    {static} + __bruitage(path: String, sigma: int)__ : void
+    {static} + __debruitage(
+        pathOriginal: String,
+        pathNoisy: String,
+        sigma: int,
+        patchs: int,
+        extractionType: String,
+        seuillageMethod: String,
+        seuilType: String
+    )__ : void
+    {static} + __loadImage(path: String)__ : BufferedImage
+    {static} + __saveImage(img: BufferedImage, path: String)__ : void
+}
 
-Image "1" *-- "many" ImageZone
-Image "1" *-- "many" Patch
-Image "1" *-- "1" Evaluation
-
-PatchSet "1" *-- "many" Patch
-PatchSet --> ACP
-PatchSet --> Thresholding
-
-Interface ..> Parameters : utilise
-
-Evaluation --> Image : évalue
-ACP --> PatchSet : traite
-Thresholding --> Patch : seuille
-
-note top of Image
-  Encapsule toutes les fonctionnalités
-  liées au traitement d'image
-end note
-
-note top of PatchSet
-  Contient l'ensemble des patches
-  et fournit des méthodes statistiques
-end note
+'### Relations ###
+ACP --> ACPResult
+ACP --> MoyCovResult
+ImageUtils --> Patch
+ImageUtils --> ImageZone
+ImageUtils --> VectorWithPosition
+Tresholding --> ACPResult
+Main ..> ImageUtils
+Main ..> ACP
+Main ..> Tresholding
+Main ..> Evaluation
 
 @enduml
