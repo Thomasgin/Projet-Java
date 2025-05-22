@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.geometry.*;
@@ -11,64 +12,21 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-/**
- * Use to create HMI for the application
- */
 public class Maquette extends Application {
-	/**
-     * Is the path of original image
-     */
+	
 	private String pathOriginal;
-    /**
-     * Is the path of image with noise
-     */
 	private String pathNoisy;
-    /**
-     * Is the path of denoised image
-     */
 	private String pathDenoised;
-    /**
-     * Is the image with noise
-     */
 	private ImageView imageBruitee;
-    /**
-     * Is the denoised image
-     */
 	private ImageView imageDebruitee;
-    /**
-     * ???
-     */
 	private Label placeholderLabelBruitee;
-    /**
-     * ???
-     */
 	private Label placeholderLabelDebruitee;
-    /**
-     * Is the width of a patch
-     */
 	private int patchs;
-    /**
-     * Is a constant which defines the noise
-     */
 	private int sigma;
-    /**
-     * Label which conatins ???
-     */
 	private Label bruiteeLabel;
-    /**
-     * Label which contains ???
-     */
 	private Label debruiteeLabel;
-    /**
-     * HBox which contains ???
-     */
 	private HBox metricsBox;
 
-
-    /**
-     * Use to start and build the app
-     * @param primaryStage is where the scene graph is set
-     */
     @Override
     public void start(Stage primaryStage) {
         BorderPane mainContainer = new BorderPane();
@@ -132,7 +90,11 @@ public class Maquette extends Application {
         appliquerDebruitage.setOnAction(e -> {
         	metricsBox.getChildren().clear();
         	try {
-        		Main.debruitage(pathOriginal, pathNoisy, sigma, patchs, extractionType.getValue(), seuillageMethod.getValue(), seuilType.getValue());
+        		if (extractionType.getValue() == "Global PCA") {
+        			Main.debruitageGlobal(pathOriginal, pathNoisy, sigma, patchs, seuillageMethod.getValue(), seuilType.getValue());
+        		} else {
+        			Main.debruitageLocal(pathOriginal, pathNoisy, sigma, patchs, seuillageMethod.getValue(), seuilType.getValue());
+        		}
         	} catch (Exception e2) {
         		// TODO Auto-generated catch block
         		e2.printStackTrace();
@@ -149,6 +111,58 @@ public class Maquette extends Application {
                     createMetricBox(Main.psnr, "PSNR (dB)"),
                     createMetricBox(Main.amelioration, "Amélioration")
             );
+        });
+        
+        Button optimiserDebruitage = new Button("Optimiser le débruitage");
+        optimiserDebruitage.setMaxWidth(Double.MAX_VALUE);
+        optimiserDebruitage.setStyle("-fx-background-color: #303f9f; -fx-text-fill: white; -fx-font-weight: 500;");
+        optimiserDebruitage.setOnAction(e -> {
+        	metricsBox.getChildren().clear();
+        	List<String> liste = null;
+        	try {
+        		liste = Main.optimiserDebruitage(pathOriginal, pathNoisy, sigma, patchs);
+        	} catch (Exception e2) {
+        		// TODO Auto-generated catch block
+        		e2.printStackTrace();
+        	}
+        	pathDenoised = liste.get(0);
+        	imageDebruitee.setImage(new Image("file:" + pathDenoised));
+        	imageDebruitee.setVisible(true);
+            placeholderLabelDebruitee.setVisible(false);
+            
+            switch(liste.get(1)) {
+            	case "Global_Doux_Bayésien": 
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Global\nMéthode de seuillage : Seuillage doux\nType de seuil : Bayésien"));
+            		break;
+            	case "Global_Dur_Bayésien":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Global\nMéthode de seuillage : Seuillage dur\nType de seuil : Bayésien"));
+            		break;
+            	case "Global_Doux_Visu":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Global\nMéthode de seuillage : Seuillage doux\nType de seuil : Visu"));
+            		break;
+            	case "Global_Dur_Visu":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Global\nMéthode de seuillage : Seuillage dur\nType de seuil : Visu"));
+            		break;
+            	case "Local_Doux_Bayésien": 
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Local\nMéthode de seuillage : Seuillage doux\nType de seuil : Bayésien"));
+            		break;
+            	case "Local_Dur_Bayésien":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Local\nMéthode de seuillage : Seuillage dur\nType de seuil : Bayésien"));
+            		break;
+            	case "Local_Doux_Visu":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Local\nMéthode de seuillage : Seuillage doux\nType de seuil : Visu"));
+            		break;
+            	case "Local_Dur_Visu":
+            		debruiteeLabel.setText(String.format("Résultat optimisé\nType d'extraction : Local\nMéthode de seuillage : Seuillage dur\nType de seuil : Visu"));
+            		break; 
+            }
+        
+            metricsBox.getChildren().addAll(
+                    createMetricBox(Main.minMse, "MSE"),
+                    createMetricBox(Main.maxPsnr, "PSNR (dB)"),
+                    createMetricBox(Main.maxAmelioration, "Amélioration")
+            );
+        	
         });
         
         patchSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -169,7 +183,8 @@ public class Maquette extends Application {
                 createParamGroup("Taille des patchs", patchSizeSlider, patchSizeLabel),
                 createParamGroup("Méthode de seuillage", seuillageMethod),
                 createParamGroup("Type de seuil", seuilType),
-                appliquerDebruitage
+                appliquerDebruitage,
+                optimiserDebruitage
         );
 
         // Image section
@@ -221,12 +236,6 @@ public class Maquette extends Application {
         primaryStage.show();
     }
 
-    /**
-     * Create a group of parameters in a Vbox 
-     * @param labelText is the string which will be insert in the Label
-     * @param control ???
-     * @return a VBow which contains the label with parameters
-     */
     private VBox createParamGroup(String labelText, Control control) {
         Label label = new Label(labelText);
         label.setStyle("-fx-font-weight: bold; -fx-text-fill: #444;");
@@ -234,13 +243,6 @@ public class Maquette extends Application {
         return box;
     }
 
-    /**
-     * Create a group of parameters in a Vbox 
-     * @param labelText is the string which will be insert in the Label
-     * @param slider is a Slider which will be add in the VBox
-     * @param valueLabel is a Label which will be add in the VBox
-     * @return a VBow which contains the label, the slider with parameters
-     */
     private VBox createParamGroup(String labelText, Slider slider, Label valueLabel) {
         VBox box = createParamGroup(labelText, slider);
         valueLabel.setStyle("-fx-text-fill: #616161;");
@@ -249,12 +251,6 @@ public class Maquette extends Application {
         return box;
     }
     
-    /**
-     * Use to create a box which contains an image, it label and a button with a assigned event
-     * @param defaultText is a text which will be add in a Label as default
-     * @param caption is a string which will be add in a Label
-     * @return VBox which conatins an image container, a button and a caption label
-     */
     private VBox createImageBoxImportable(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -300,12 +296,6 @@ public class Maquette extends Application {
         return box;
     }
     
-    /**
-     * Use to create a box which contains an image, it label in order to print the noised image 
-     * @param defaultText is a text which will be add in a Label as default
-     * @param caption is a string which will be add in a Label
-     * @return VBox which conatins an image container and  a caption label
-     */
     private VBox createDynamicImageBoxNoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -337,12 +327,6 @@ public class Maquette extends Application {
         return box;
     }
     
-    /**
-     * Use to create a box which contains an image, it label in order to print the denoised image 
-     * @param defaultText is a text which will be add in a Label as default
-     * @param caption is a string which will be add in a Label
-     * @return VBox which conatins an image container and  a caption label
-     */
     private VBox createDynamicImageBoxDenoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -374,33 +358,6 @@ public class Maquette extends Application {
         return box;
     }
 
-
-
-   /* private VBox createImageBox(String placeholder, String caption) {
-        Label placeholderLabel = new Label(placeholder);
-        placeholderLabel.setMinHeight(220);
-        placeholderLabel.setAlignment(Pos.CENTER);
-        placeholderLabel.setMaxWidth(Double.MAX_VALUE);
-        placeholderLabel.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #bdbdbd; -fx-border-style: dashed; -fx-border-radius: 4px; -fx-padding: 20px; -fx-text-fill: #757575;");
-        
-        Label captionLabel = new Label(caption);
-        captionLabel.setStyle("-fx-font-weight: 500;");
-
-        VBox box = new VBox(12, placeholderLabel, captionLabel);
-        box.setAlignment(Pos.TOP_CENTER);
-        box.setPadding(new Insets(15));
-        box.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 6px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 3, 0, 0, 1);");
-
-        VBox.setVgrow(placeholderLabel, Priority.ALWAYS);
-        return box;
-    }*/
-
-    /**
-    * ???
-    * @param value ???
-    * @param label ???
-    * @return VBow which contains ??? 
-    */
     private VBox createMetricBox(double value, String label) {
         Label valueLabel = new Label();
         valueLabel.setText(String.format("%.2f", value));
@@ -416,10 +373,7 @@ public class Maquette extends Application {
 
     
     
-    /**
-     * Use to launch the app
-     * @param args is a string tabular which contains arguments
-     */
+
     public static void main(String[] args) {
         launch(args);
     }

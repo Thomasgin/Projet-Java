@@ -7,20 +7,8 @@ import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Use to apply all methode on image as split it, extract patchs, apply noise on it, ...
- */
+
 public class ImageUtils {
-    /**
-     * Default constructor
-     */
-    public ImageUtils(){}
-    /**
-     * Apply noise depending on sigma on a image
-     * @param X0 a BufferedImage where we work on it
-     * @param sigma a constant
-     * @return a noise image
-     */
     public static BufferedImage noising(BufferedImage X0, double sigma) {
         int width = X0.getWidth();
         int height = X0.getHeight();
@@ -46,13 +34,7 @@ public class ImageUtils {
         noisy.setData(noisyRaster);
         return noisy;
     }
-
-    /**
-     * Extract patchs from image
-     * @param X a BufferedImage
-     * @param s a constant which is the width of patchs
-     * @return A List of Patch which contains all patchs
-     */
+    
     public static List<Patch> extractPatches(BufferedImage X, int s) {
         List<Patch> patches = new ArrayList<>();
         Raster raster = X.getRaster();
@@ -80,13 +62,6 @@ public class ImageUtils {
         return patches;
     }
     
-    /**
-     * Rebuild an image from a List of Patch
-     * @param patches a list of all patchs
-     * @param height of original image
-     * @param width of the original image
-     * @return A BufferImage which had been rebuilt from patchs
-     */
     public static BufferedImage reconstructPatches(List<Patch> patches, int height, int width) {
         int[][] sum = new int[height][width];
         int[][] count = new int[height][width];
@@ -130,33 +105,47 @@ public class ImageUtils {
 
         return result;
     }
-    /**
-     * Split an image in sub-images
-     * @param X a BufferdImage
-     * @param W a constant to delimitation working zone
-     * @param n gap between cut in original image X
-     * @return A List of ImageZone which contains coordinates of all sub-images
-     */
-    public static List<ImageZone> decoupeImage(BufferedImage X, int W, int n) {
+    
+    public static List<ImageZone> decoupeImage(BufferedImage image, int W, int pas) {
         List<ImageZone> zones = new ArrayList<>();
-        int width = X.getWidth();
-        int height = X.getHeight();
 
-        for (int y = 0; y <= height - W; y += n) {
-            for (int x = 0; x <= width - W; x += n) {
-                BufferedImage subImage = X.getSubimage(x, y, W, W);
-                zones.add(new ImageZone(subImage, x, y));
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        for (int y = 0; y <= height - W; y += pas) {
+            for (int x = 0; x <= width - W; x += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
             }
+        }
+
+        // Ajout des zones de bordures droites (si image non divisible)
+        if ((width - W) % pas != 0) {
+            int x = width - W;
+            for (int y = 0; y <= height - W; y += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
+            }
+        }
+
+        if ((height - W) % pas != 0) {
+            int y = height - W;
+            for (int x = 0; x <= width - W; x += pas) {
+                BufferedImage sub = image.getSubimage(x, y, W, W);
+                zones.add(new ImageZone(sub, x, y));
+            }
+        }
+
+        // Coin bas droit si nécessaire
+        if ((width - W) % pas != 0 && (height - W) % pas != 0) {
+            BufferedImage sub = image.getSubimage(width - W, height - W, W, W);
+            zones.add(new ImageZone(sub, width - W, height - W));
         }
 
         return zones;
     }
-
-    /**
-     * Vectorise patchs
-     * @param patches is a list of patchs
-     * @return A List of VectorWithPosition
-     */
+    
+    
     public static List<VectorWithPosition> VectorPatchs(List<Patch> patches) {
         List<VectorWithPosition> result = new ArrayList<>();
 
@@ -167,42 +156,38 @@ public class ImageUtils {
         return result;
     }
     
-    /**
-     * Calculate MSE between two images, pixel by pixel
-     * @param img1 a BufferedImage
-     * @param img2 a BufferedImage
-     * @return float MSE
-     */
-    public static double computeMSE(BufferedImage img1, BufferedImage img2) {
-        int width = img1.getWidth();
-        int height = img1.getHeight();
-        double mse = 0.0;
+    public static BufferedImage recomposeFromZones(List<ImageZone> zones, int width, int height) {
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        WritableRaster raster = result.getRaster();
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int pixel1 = img1.getRaster().getSample(x, y, 0);
-                int pixel2 = img2.getRaster().getSample(x, y, 0);
-                double diff = pixel1 - pixel2;
-                mse += diff * diff;
+        double[][] sum = new double[height][width];
+        int[][] count = new int[height][width];
+
+        for (ImageZone zone : zones) {
+            BufferedImage img = zone.getImage();
+            int offsetX = zone.getPosition()[0];
+            int offsetY = zone.getPosition()[1];
+            Raster zoneRaster = img.getRaster();
+
+            for (int y = 0; y < img.getHeight(); y++) {
+                for (int x = 0; x < img.getWidth(); x++) {
+                    int val = zoneRaster.getSample(x, y, 0);
+                    sum[offsetY + y][offsetX + x] += val;
+                    count[offsetY + y][offsetX + x]++;
+                }
             }
         }
 
-        mse /= (width * height);
-        return mse;
-    }
-    
-    /**
-     * Camculate PSNR between two images, pixel by pixel
-     * @param mse aka mean squared error from the same case
-     * @return Float psnr
-     */
-    public static double computePSNR(double mse) {
-        if (mse == 0) {
-            return Double.POSITIVE_INFINITY; // Same images
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int val = (count[y][x] > 0) ? (int) Math.round(sum[y][x] / count[y][x]) : 0;
+                raster.setSample(x, y, 0, Math.max(0, Math.min(255, val)));
+            }
         }
-        return 10 * Math.log10((255 * 255) / mse);
-    }
 
+        result.setData(raster);
+        return result;
+    }
 
 
 }

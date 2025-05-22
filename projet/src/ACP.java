@@ -3,20 +3,8 @@
 import java.util.List;
 import org.apache.commons.math3.linear.*;
 
-/**
- * Use to apply ACP on each patchs which had been extracted from a noise image
- */
 public class ACP {
-    /**
-     * Default constructor of ACP
-     */
-    public ACP(){}
 
-    /**
-     * Calculate ACP on vectors from patchs in order to isolate noise
-     * @param V is a list of vectors
-     * @return an ACPResult instance which contains results of ACP
-     */
     public static ACPResult computeACP(List<double[]> V) {
         MoyCovResult stats = MoyCov(V);
         double[] moyenne = stats.moyenne;
@@ -43,11 +31,6 @@ public class ACP {
         return new ACPResult(moyenne, base, valeurs);
     }
 
-    /**
-     * Calculate the mean of covariance from a List of double[]
-     * @param V is a list of vectors
-     * @return a MoyCovResult instance which contains results of calculation
-     */
     public static MoyCovResult MoyCov(List<double[]> V) {
         int n = V.size();
         int d = V.get(0).length;
@@ -55,7 +38,7 @@ public class ACP {
         double[] moyenne = new double[d];
         List<double[]> Vc = new java.util.ArrayList<>();
 
-        // Mean
+        // Moyenne
         for (double[] v : V) {
             for (int i = 0; i < d; i++) {
                 moyenne[i] += v[i];
@@ -65,7 +48,7 @@ public class ACP {
             moyenne[i] /= n;
         }
 
-        // Centering
+        // Centrage
         for (double[] v : V) {
             double[] centered = new double[d];
             for (int i = 0; i < d; i++) {
@@ -92,12 +75,6 @@ public class ACP {
         return new MoyCovResult(moyenne, covariance, Vc);
     }
     
-    /**
-     * Calculate the contribution
-     * @param U is a matrix
-     * @param Vc is a list of vectors
-     * @return matrix which contains contributions
-     */
     public static double[][] project(double[][] U, List<double[]> Vc) {
         int d = U.length;              // dimension d
         int s2 = U[0].length;          // nombre de composantes (s²)
