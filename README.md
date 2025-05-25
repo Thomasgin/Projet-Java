@@ -1,31 +1,39 @@
-README:  
-  titre: "Application de Traitement d’Images en JavaFX"  
+"Application de Traitement d’Images en JavaFX"  
   description: >  
     Ce projet est une application desktop développée en JavaFX pour le traitement d’images : importation, ajout de bruit, débruitage et affichage des résultats avec des métriques.  
 
   arborescence:  
     description: "Arborescence du projet"  
-    structure: |  
-      .  
-      ├── analyse  
-      │   ├── diagrammePNG  
-      │   ├── diagrammePUML  
-      │   ├── feedback  
-      │   ├── gantt  
-      │   └── maquette  
-      ├── Groupe11_Livrable1.pdf  
-      ├── Groupe11_Livrable3.pdf  
-      ├── projet  
-      │   ├── images  
-      │   │   ├── bruitees  
-      │   │   ├── results  
-      │   │   └── sources   
-      │   ├── lib  
-      │   └── src  
-      └── README.md  
+    structure: 
+  Projet-Java  
+  ├── analyse  
+  │   ├── diagrammePNG  
+  │   ├── diagrammePUML   
+  │   ├── feedback   
+  │   ├── gantt   
+  │   └── maquette  
+  ├── Application.jar   
+  ├── Groupe11_Livrable1.pdf  
+  ├── Groupe11_Livrable3  
+  │   ├── class.png  
+  │   ├── content  
+  │   ├── main.bcf  
+  │   ├── main.pdf  
+  │   ├── main.run.xml  
+  │   ├── main.tex  
+  │   ├── reference  
+  │   └── setting  
+  ├── Groupe11_Livrable3.pdf  
+  ├── projet  
+  │   ├── images  
+  │   ├── lib  
+  │   └── src  
+  ├── README.md  
+  └── sources.jar  
+
     explications:  
-      - "analyse/ : diagrammes UML, planning, maquette UI."  
-      - "projet/images/ : images sources, bruitées, résultats."  
+      - "analyse/ : diagrammes UML, planning, maquette UI."    
+      - "projet/images/ : images sources, bruitées, résultats."    
       - "projet/lib/ : bibliothèques tierces (ex : commons-math)."  
       - "projet/src/ : code source Java."  
 
@@ -66,11 +74,6 @@ README:
     - "Placée dans projet/lib/commons-math3-3.6.1.jar"    
     - "À inclure dans compilation et exécution si utilisé."    
 
-  notes:    
-    - "Adapter le chemin vers JavaFX SDK selon votre installation."   
-    - "Vérifier la compatibilité des versions Java et JavaFX."   
-    - "Les images sources sont dans projet/images/sources."   
 
-  auteurs_et_contact:   
     - "Projet réalisé par le groupe 11."   
 
