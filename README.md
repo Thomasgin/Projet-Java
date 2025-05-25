@@ -1,28 +1,79 @@
-[# Projet-Java]
-Explication maths
-https://chatgpt.com/share/6807917f-849c-800e-8edb-b4d351259677
-
 Arborescence fichier :   
-Projet-Java    
-├── diagrammePNG  
-├── diagrammePUML  
-├── grayscale  
-├── ImageDenoiser  
-│   ├── bin  
-│   │   └── denoiser  
-│   ├── images_bruitees  
-│   ├── images_reconstruites  
-│   │   ├── sigma10  
-│   │   ├── sigma15  
-│   │   ├── sigma25  
-│   │   ├── sigma30  
-│   │   ├── sigma35  
-│   │   ├── sigma40  
-│   │   └── sigma5  
-│   ├── images_sources  
-│   ├── lib  
+Projet-Java     
+├── analyse   
+│   ├── diagrammePNG   
+│   │   ├── classDiagramm.png   
+│   │   ├── etatTransition.png   
+│   │   ├── sequence.png   
+│   │   ├── useCase.png   
+│   │   └── workflow.png   
+│   ├── diagrammePUML   
+│   │   ├── diagClass.puml   
+│   │   ├── diagEtatTransi.puml   
+│   │   ├── diagSequence.puml   
+│   │   ├── diagUseCase.puml   
+│   │   └── diagWorkflow.puml  
+│   ├── feedback   
+│   │   └── reunion1.txt   
+│   ├── gantt   
+│   │   └── ganttL1.mmd   
+│   └── maquette   
+│       ├── Maquette.java   
+│       └── maquette.png   
+├── Groupe11_Livrable1.pdf   
+├── Groupe11_Livrable3.pdf   
+├── projet   
+│   ├── bin   
+│   │   ├── ACP.class  
+│   │   ├── ACPResult.class  
+│   │   ├── Evaluation.class  
+│   │   ├── ImageUtils.class  
+│   │   ├── ImageZone.class  
+│   │   ├── Main.class  
+│   │   ├── Maquette.class  
+│   │   ├── MoyCovResult.class  
+│   │   ├── Patch.class  
+│   │   ├── Thresholding.class  
+│   │   └── VectorWithPosition.class  
+│   ├── images  
+│   │   ├── bruitees  
+│   │   │   └── image_noisy_sigma20.jpeg  
+│   │   ├── results  
+│   │   │   ├── image_denoised_sigma20_patchs15.jpeg  
+│   │   │   └── resultats.txt  
+│   │   └── sources  
+│   │       ├── ascenseur.png  
+│   │       ├── barriere.png  
+│   │       ├── batiment.png  
+│   │       ├── bunker.png  
+│   │       ├── cafe.png  
+│   │       ├── escalier.png  
+│   │       ├── inscriptions.png  
+│   │       ├── lena2.png  
+│   │       ├── lena.jpeg  
+│   │       ├── poubelle.png  
+│   │       ├── radiateur.png  
+│   │       ├── sol.png  
+│   │       └── toit.png  
+│   ├── lib
+│   │   ├── commons-math3-3.6.1.jar  
+│   │   ├── commons-math3-3.6.1-javadoc.jar  
+│   │   ├── commons-math3-3.6.1-sources.jar  
+│   │   ├── commons-math3-3.6.1-tests.jar  
+│   │   ├── commons-math3-3.6.1-test-sources.jar  
+│   │   └── commons-math3-3.6.1-tools.jar  
 │   └── src  
-│       └── denoiser  
-└── maquette  
+│       ├── ACP.java  
+│       ├── ACPResult.java  
+│       ├── Evaluation.java  
+│       ├── ImageUtils.java  
+│       ├── ImageZone.java  
+│       ├── Main.java  
+│       ├── Maquette.java  
+│       ├── MoyCovResult.java  
+│       ├── Patch.java  
+│       ├── Thresholding.java  
+│       └── VectorWithPosition.java  
+└── README.md  
 
 
