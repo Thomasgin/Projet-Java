@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * Represents the result of the mean and covariance calculation,
  * including principal components used in the denoising process.
