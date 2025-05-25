@@ -45,16 +45,16 @@ public class Maquette extends Application {
     private String pathDenoised;
     
     /** ImageView displaying the noisy image */
-    private ImageView imageBruitee;
+    private ImageView imageNoisy;
     
     /** ImageView displaying the denoised image */
-    private ImageView imageDebruitee;
+    private ImageView imageDenoised;
     
     /** Label placeholder shown when no noisy image is loaded */
-    private Label placeholderLabelBruitee;
+    private Label placeholderLabelNoisy;
     
     /** Label placeholder shown when no denoised image is loaded */
-    private Label placeholderLabelDebruitee;
+    private Label placeholderLabelDenoised;
     
     /** Size of image patches used for PCA */
     private int patchs;
@@ -63,10 +63,10 @@ public class Maquette extends Application {
     private int sigma;
     
     /** Label for the noisy image description */
-    private Label bruiteeLabel;
+    private Label labelNoisy;
     
     /** Label for the denoised image description */
-    private Label debruiteeLabel;
+    private Label labelDenoised;
     
     /** Container displaying quality metrics like MSE, PSNR, and improvement */
     private HBox metricsBox;
@@ -161,7 +161,7 @@ public class Maquette extends Application {
 	        pathDenoised = "images/results/image_denoised_sigma" + sigma + "_patchs" + patchs +".jpeg";
 	        imageDenoised.setImage(new Image("file:" + pathDenoised));
 	        imageDenoised.setVisible(true);
-	        placeholderLabelDebruitee.setVisible(false);
+	        placeholderLabelDenoised.setVisible(false);
 	        
 	        labelDenoised.setText(String.format("Type d'extraction : " + extractionType.getValue() + "\nMéthode de Seuillage : " + seuillageMethod.getValue() + "\nType de Seuil : " + seuilType.getValue()));
 	        
@@ -189,7 +189,7 @@ public class Maquette extends Application {
 	        pathDenoised = liste.get(0);
 	        imageDenoised.setImage(new Image("file:" + pathDenoised));
 	        imageDenoised.setVisible(true);
-	        placeholderLabelDebruitee.setVisible(false);
+	        placeholderLabelDenoised.setVisible(false);
 	        
 	        // Label update according to optimization
 	        switch(liste.get(1)) {
@@ -388,22 +388,22 @@ public class Maquette extends Application {
         imageContainer.setPrefHeight(220);
         imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #bdbdbd; -fx-border-style: dashed; -fx-border-radius: 4px;");
 
-        placeholderLabelBruitee = new Label(defaultText);
-        placeholderLabelBruitee.setTextFill(Color.web("#757575"));
+        placeholderLabelNoisy = new Label(defaultText);
+        placeholderLabelNoisy.setTextFill(Color.web("#757575"));
 
-        imageBruitee = new ImageView();
-        imageBruitee.setPreserveRatio(true);
-        imageBruitee.setFitHeight(220);
-        imageBruitee.setVisible(false);
+        imageNoisy = new ImageView();
+        imageNoisy.setPreserveRatio(true);
+        imageNoisy.setFitHeight(220);
+        imageNoisy.setVisible(false);
 
-        imageContainer.getChildren().addAll(imageBruitee, placeholderLabelBruitee);
+        imageContainer.getChildren().addAll(imageNoisy, placeholderLabelNoisy);
 
-        bruiteeLabel = new Label(caption);
-        bruiteeLabel.setStyle("-fx-font-weight: 500;");
+        labelNoisy = new Label(caption);
+        labelNoisy.setStyle("-fx-font-weight: 500;");
 
-        imageBruitee.getProperties().put("placeholder", placeholderLabelBruitee);
+        imageNoisy.getProperties().put("placeholder", placeholderLabelNoisy);
 
-        box.getChildren().addAll(imageContainer, bruiteeLabel);
+        box.getChildren().addAll(imageContainer, labelNoisy);
         return box;
     }
     
@@ -425,24 +425,24 @@ public class Maquette extends Application {
         imageContainer.setPrefHeight(220);
         imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #bdbdbd; -fx-border-style: dashed; -fx-border-radius: 4px;");
 
-        placeholderLabelDebruitee = new Label(defaultText);
-        placeholderLabelDebruitee.setTextFill(Color.web("#757575"));
+        placeholderLabelDenoised = new Label(defaultText);
+        placeholderLabelDenoised.setTextFill(Color.web("#757575"));
 
-        imageDebruitee = new ImageView();
-        imageDebruitee.setPreserveRatio(true);
-        imageDebruitee.setFitHeight(220);
-        imageDebruitee.setVisible(false);
+        imageDenoised = new ImageView();
+        imageDenoised.setPreserveRatio(true);
+        imageDenoised.setFitHeight(220);
+        imageDenoised.setVisible(false);
 
         // Ajouter au conteneur
-        imageContainer.getChildren().addAll(imageDebruitee, placeholderLabelDebruitee);
+        imageContainer.getChildren().addAll(imageDenoised, placeholderLabelDenoised);
 
-        debruiteeLabel = new Label(caption);
-        debruiteeLabel.setStyle("-fx-font-weight: 500;");
+        labelDenoised = new Label(caption);
+        labelDenoised.setStyle("-fx-font-weight: 500;");
 
         // On stocke aussi le placeholder pour pouvoir le cacher plus tard
-        imageDebruitee.getProperties().put("placeholder", placeholderLabelDebruitee);
+        imageDenoised.getProperties().put("placeholder", placeholderLabelDenoised);
 
-        box.getChildren().addAll(imageContainer, debruiteeLabel);
+        box.getChildren().addAll(imageContainer, labelDenoised);
         return box;
     }
 
