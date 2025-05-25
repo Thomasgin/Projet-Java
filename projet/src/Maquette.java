@@ -11,22 +11,76 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+/**
+ * Main JavaFX GUI class for an image denoising application using
+ * Principal Component Analysis (PCA).
+ * 
+ * <p>
+ * This class manages the creation and display of the main window containing:
+ * <ul>
+ *   <li>A parameters panel to adjust options for adding noise, denoising, and optimization.</li>
+ *   <li>A display area showing the original, noisy, and denoised images.</li>
+ *   <li>Buttons to apply noise, apply denoising, optimize results, export, reset, and save outputs.</li>
+ * </ul>
+ * 
+ * <p>
+ * The typical workflow is to load an original image, add artificial noise,
+ * apply denoising with various parameters (extraction type, thresholding method, etc.),
+ * then visualize and compare the results.
+ * 
+ * <p>
+ * This class relies on the Main class (not included here) to perform image processing
+ * tasks such as noise addition and denoising.
+ * 
+ * @see javafx.application.Application
+ */
 public class Maquette extends Application {
-	
-	private String pathOriginal;
-	private String pathNoisy;
-	private String pathDenoised;
-	private ImageView imageBruitee;
-	private ImageView imageDebruitee;
-	private Label placeholderLabelBruitee;
-	private Label placeholderLabelDebruitee;
-	private int patchs;
-	private int sigma;
-	private Label bruiteeLabel;
-	private Label debruiteeLabel;
-	private HBox metricsBox;
+/** Path to the loaded original image */
+    private String pathOriginal;
+    
+    /** Path to the generated noisy image */
+    private String pathNoisy;
+    
+    /** Path to the generated denoised image */
+    private String pathDenoised;
+    
+    /** ImageView displaying the noisy image */
+    private ImageView imageBruitee;
+    
+    /** ImageView displaying the denoised image */
+    private ImageView imageDebruitee;
+    
+    /** Label placeholder shown when no noisy image is loaded */
+    private Label placeholderLabelBruitee;
+    
+    /** Label placeholder shown when no denoised image is loaded */
+    private Label placeholderLabelDebruitee;
+    
+    /** Size of image patches used for PCA */
+    private int patchs;
+    
+    /** Noise level (standard deviation sigma) */
+    private int sigma;
+    
+    /** Label for the noisy image description */
+    private Label bruiteeLabel;
+    
+    /** Label for the denoised image description */
+    private Label debruiteeLabel;
+    
+    /** Container displaying quality metrics like MSE, PSNR, and improvement */
+    private HBox metricsBox;
 
+    /**
+     * Entry point of the JavaFX application.
+     * 
+     * <p>
+     * Sets up the main window with controls for noise addition, denoising,
+     * optimization, and image displays. Connects UI elements to the image processing
+     * logic in the Main class.
+     * 
+     * @param primaryStage the main stage provided by JavaFX runtime
+     */
     @Override
     public void start(Stage primaryStage) {
         BorderPane mainContainer = new BorderPane();
@@ -236,6 +290,13 @@ public class Maquette extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Creates a vertical box (VBox) containing a bold label and a control.
+     * 
+     * @param labelText the text for the label describing the control
+     * @param control   the JavaFX control to be displayed below the label
+     * @return a VBox containing the label and control vertically spaced
+     */
     private VBox createParamGroup(String labelText, Control control) {
         Label label = new Label(labelText);
         label.setStyle("-fx-font-weight: bold; -fx-text-fill: #444;");
@@ -243,6 +304,15 @@ public class Maquette extends Application {
         return box;
     }
 
+    /**
+     * Creates a vertical box (VBox) containing a bold label, a slider control,
+     * and a label displaying the slider's current value.
+     * 
+     * @param labelText  the text for the label describing the slider
+     * @param slider     the slider control to adjust some parameter
+     * @param valueLabel the label showing the current value of the slider
+     * @return a VBox containing the label, slider, and value label arranged vertically
+     */
     private VBox createParamGroup(String labelText, Slider slider, Label valueLabel) {
         VBox box = createParamGroup(labelText, slider);
         valueLabel.setStyle("-fx-text-fill: #616161;");
@@ -251,6 +321,15 @@ public class Maquette extends Application {
         return box;
     }
     
+    /**
+     * Creates a VBox containing an image container with placeholder text,
+     * a button to import an image from file, and a caption label below.
+     * This is used for importing the original image.
+     * 
+     * @param defaultText placeholder text shown when no image is loaded
+     * @param caption     a descriptive label shown below the image area
+     * @return a VBox containing the image import UI elements
+     */
     private VBox createImageBoxImportable(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -296,6 +375,14 @@ public class Maquette extends Application {
         return box;
     }
     
+    /**
+     * Creates a VBox for displaying the noisy image with a placeholder label
+     * shown when no image is present, along with a caption label.
+     * 
+     * @param defaultText placeholder text shown when no noisy image is loaded
+     * @param caption     a descriptive label below the image area
+     * @return a VBox containing the noisy image display UI
+     */
     private VBox createDynamicImageBoxNoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -314,19 +401,25 @@ public class Maquette extends Application {
         imageBruitee.setFitHeight(220);
         imageBruitee.setVisible(false);
 
-        // Ajouter au conteneur
         imageContainer.getChildren().addAll(imageBruitee, placeholderLabelBruitee);
 
         bruiteeLabel = new Label(caption);
         bruiteeLabel.setStyle("-fx-font-weight: 500;");
 
-        // On stocke aussi le placeholder pour pouvoir le cacher plus tard
         imageBruitee.getProperties().put("placeholder", placeholderLabelBruitee);
 
         box.getChildren().addAll(imageContainer, bruiteeLabel);
         return box;
     }
     
+    /**
+     * Creates a VBox for displaying the denoised image with a placeholder label
+     * shown when no image is present, along with a caption label.
+     * 
+     * @param defaultText placeholder text shown when no denoised image is loaded
+     * @param caption     a descriptive label below the image area
+     * @return a VBox containing the denoised image display UI
+     */
     private VBox createDynamicImageBoxDenoised(String defaultText, String caption) {
         VBox box = new VBox(12);
         box.setAlignment(Pos.TOP_CENTER);
@@ -358,7 +451,15 @@ public class Maquette extends Application {
         return box;
     }
 
-    private VBox createMetricBox(double value, String label) {
+    /**
+     * Creates a VBox containing a formatted metric value and its label.
+     * Used for displaying quantitative measures like MSE, PSNR, or improvement.
+     * 
+     * @param value the numeric metric value to display
+     * @param label the name or description of the metric
+     * @return a styled VBox containing the metric value and label
+     */
+        private VBox createMetricBox(double value, String label) {
         Label valueLabel = new Label();
         valueLabel.setText(String.format("%.2f", value));
         valueLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
@@ -371,9 +472,11 @@ public class Maquette extends Application {
         return box;
     }
 
-    
-    
-
+    /**
+     * The main entry point of the JavaFX application.
+     * 
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         launch(args);
     }

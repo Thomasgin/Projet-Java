@@ -1,25 +1,25 @@
-
-
 import java.util.List;
 import org.apache.commons.math3.linear.*;
 
 public class ACP {
 
+    /**
+     * Performs Principal Component Analysis on a list of vectors
+     * @param V List of input vectors (each as double array)
+     * @return ACPResult containing mean, eigenbasis and eigenvalues
+     */
     public static ACPResult computeACP(List<double[]> V) {
         MoyCovResult stats = MoyCov(V);
         double[] moyenne = stats.moyenne;
         double[][] covariance = stats.covariance;
 
-        // Convertir en RealMatrix
         RealMatrix covMatrix = new Array2DRowRealMatrix(covariance);
 
-        // Décomposition en valeurs propres
         EigenDecomposition eig = new EigenDecomposition(covMatrix);
         int d = moyenne.length;
 
-        // Récupérer les valeurs propres et vecteurs propres
         double[] valeurs = eig.getRealEigenvalues();
-        double[][] base = new double[d][d]; // colonne i = vecteur propre i
+        double[][] base = new double[d][d];
 
         for (int i = 0; i < d; i++) {
             double[] vi = eig.getEigenvector(i).toArray();
@@ -31,6 +31,11 @@ public class ACP {
         return new ACPResult(moyenne, base, valeurs);
     }
 
+    /**
+     * Computes mean and covariance matrix of input vectors
+     * @param V List of input vectors
+     * @return MoyCovResult containing mean, covariance and centered vectors
+     */
     public static MoyCovResult MoyCov(List<double[]> V) {
         int n = V.size();
         int d = V.get(0).length;
@@ -38,7 +43,6 @@ public class ACP {
         double[] moyenne = new double[d];
         List<double[]> Vc = new java.util.ArrayList<>();
 
-        // Moyenne
         for (double[] v : V) {
             for (int i = 0; i < d; i++) {
                 moyenne[i] += v[i];
@@ -48,7 +52,6 @@ public class ACP {
             moyenne[i] /= n;
         }
 
-        // Centrage
         for (double[] v : V) {
             double[] centered = new double[d];
             for (int i = 0; i < d; i++) {
@@ -57,7 +60,6 @@ public class ACP {
             Vc.add(centered);
         }
 
-        // Covariance
         double[][] covariance = new double[d][d];
         for (double[] v : Vc) {
             for (int i = 0; i < d; i++) {
@@ -75,15 +77,21 @@ public class ACP {
         return new MoyCovResult(moyenne, covariance, Vc);
     }
     
+    /**
+     * Projects centered vectors onto principal components
+     * @param U Matrix of eigenvectors (each column is an eigenvector)
+     * @param Vc List of centered vectors
+     * @return Matrix of projections (contributions to each component)
+     */
     public static double[][] project(double[][] U, List<double[]> Vc) {
-        int d = U.length;              // dimension d
-        int s2 = U[0].length;          // nombre de composantes (s²)
-        int M = Vc.size();             // nombre de vecteurs
+        int d = U.length;
+        int s2 = U[0].length;
+        int M = Vc.size();
 
         double[][] contributions = new double[M][s2];
 
         for (int k = 0; k < M; k++) {
-            double[] vk = Vc.get(k);   // vecteur centré
+            double[] vk = Vc.get(k);
             for (int i = 0; i < s2; i++) {
                 double sum = 0.0;
                 for (int j = 0; j < d; j++) {

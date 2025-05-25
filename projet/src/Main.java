@@ -1,25 +1,40 @@
+/**
+     * Mean squared error between original and denoised images.
+     */
+    public static double mse;
 
+    /**
+     * Peak signal-to-noise ratio computed from MSE.
+     */
+    public static double psnr;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+    /**
+     * Minimum mean squared error observed (for evaluation).
+     */
+    public static double minMse;
 
-import javax.imageio.ImageIO;
+    /**
+     * Maximum PSNR observed (for evaluation).
+     */
+    public static double maxPsnr;
 
-public class Main {
-	
-	public static double mse;
-	public static double psnr;
-	public static double minMse;
-	public static double maxPsnr;
-	public static double amelioration;
-	public static double maxAmelioration;
+    /**
+     * Percentage improvement of denoising compared to noisy image.
+     */
+    public static double amelioration;
 
+    /**
+     * Maximum observed improvement (for evaluation).
+     */
+    public static double maxAmelioration;
+
+    /**
+     * Adds Gaussian noise to the image at the given path and saves the noisy image.
+     *
+     * @param path the file path to the original clean image (grayscale)
+     * @param sigma the standard deviation of the Gaussian noise to add
+     * @throws Exception if image loading or saving fails
+     */
     public static void bruitage(String path, int sigma) throws Exception {
     	// Charger l’image propre (grayscale)
         BufferedImage original = loadImage(path);
@@ -32,44 +47,40 @@ public class Main {
 
         System.out.println("Image bruitée sauvegardée.");
     }
-    
+
+    /**
+     * Performs global PCA-based denoising on a noisy image given the original image,
+     * noise level, patch size, thresholding method, and threshold type.
+     * Saves the denoised image and writes the evaluation results to a file.
+     *
+     * @param pathOriginal the file path to the original clean image
+     * @param pathNoisy the file path to the noisy image
+     * @param sigma the noise standard deviation
+     * @param patchs the size of patches (patch dimension)
+     * @param seuillageMethod the thresholding method ("soft" or "hard")
+     * @param seuilType the threshold type ("Bayésien" or "VisuShrink")
+     * @throws Exception if image loading, processing or saving fails
+     */    
     public static void debruitageGlobal(String pathOriginal, String pathNoisy, int sigma, int patchs, String seuillageMethod, String seuilType) throws Exception {
     	BufferedImage original = ImageIO.read(new File(pathOriginal));
     	BufferedImage noisy = ImageIO.read(new File(pathNoisy));
     	
-    	// 3. Extraction des patchs
+
         List<Patch> patches = ImageUtils.extractPatches(noisy, patchs);
 
-        // 4. Conversion en vecteurs
         List<double[]> vectors = patches.stream()
                                         .map(Patch::toVector)
                                         .toList();
 
-        // 5. ACP
         ACPResult acpResult = ACP.computeACP(vectors);
 
-        // 6. Projection
+
         List<double[]> Vc = ACP.MoyCov(vectors).Vc;
         double[][] contributions = ACP.project(acpResult.base, Vc);
 
-        // 7. Dossier de sortie pour sigma
-       // File dir = new File(sigmaDir);
-       // if (!dir.exists()) dir.mkdirs();
-
-        // 8. Écriture du fichier résultats
         FileWriter fw = new FileWriter("images/results/resultats.txt");
         PrintWriter pw = new PrintWriter(fw);
 
-        /*String[] noms = { "DouxBayes", "DurBayes", "DouxVisu", "DurVisu" };
-        boolean[] softFlags = { true, false, true, false };
-        boolean[] bayesFlags = { true, true, false, false };
-
-        for (int i = 0; i < 4; i++) {
-           	String nom = noms[i];
-            boolean isSoft = softFlags[i];
-            boolean isBayes = bayesFlags[i];*/
-
-        // Calcul lambda
         double lambda;
         if (seuilType == "Bayésien") {
         	double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
@@ -78,7 +89,7 @@ public class Main {
             lambda = Thresholding.seuilVisu(sigma, patchs * patchs);
         }
 
-        // Seuillage
+
         double[][] contributionsSeuillees;
         if (seuillageMethod == "Seuillage doux") {
         	contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, true);
@@ -86,7 +97,7 @@ public class Main {
         	contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, false);
         }
 
-        // Reconstruction
+
         List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
             contributionsSeuillees, acpResult.base, acpResult.moyenne);
 
@@ -107,14 +118,14 @@ public class Main {
         psnr = Evaluation.psnr(mse);
         
         double mseBruitee = Evaluation.mse(original, noisy);
-        //double psnrBruitee = Evaluation.psnr(mseBruitee);
+
         
         amelioration = (mseBruitee - mse) / mseBruitee * 100;
         	
         System.out.printf("\nMSE = %.2f", mse);
         System.out.printf("\nPSNR = %.2f", psnr);
         System.out.printf("\nMSE = %.2f", mseBruitee);
-       // System.out.printf("\nPSNR = %.2f", psnrBruitee);
+
    
         pw.printf("-----------Résultats du débruitage de l'image-----------\nSigma : " + sigma + "\nPatchs : " + patchs + "x" + patchs + "\nType d'extraction : Global\nMéthode de seuillage : " + seuillageMethod + "\nType de seuil : " + seuilType);
         pw.printf("\n\nMSE = %.2f, PSNR = %.2f dB%n", mse, psnr);
@@ -123,6 +134,19 @@ public class Main {
         System.out.println("Traitement terminé pour sigma = " + sigma + " et patchs = " + patchs + "x" + patchs);
     }
     
+    /**
+     * Performs local PCA-based denoising on a noisy image by dividing the image
+     * into overlapping zones, denoising each zone independently, then recomposing
+     * the full image. Supports different thresholding methods and threshold types.
+     *
+     * @param pathOriginal the file path to the original clean image
+     * @param pathNoisy the file path to the noisy image
+     * @param sigma the noise standard deviation
+     * @param patchs the size of patches (patch dimension)
+     * @param seuillageMethod the thresholding method ("soft" or "hard")
+     * @param seuilType the threshold type ("Bayésien" or "VisuShrink")
+     * @throws Exception if image loading, processing, or saving fails
+     */
     public static void debruitageLocal(String pathOriginal, String pathNoisy, int sigma, int patchs, String seuillageMethod, String seuilType) throws Exception {
     	BufferedImage original = ImageIO.read(new File(pathOriginal));
     	BufferedImage noisy = ImageIO.read(new File(pathNoisy));
@@ -209,27 +233,48 @@ public class Main {
         System.out.println("\nTraitement terminé pour sigma = " + sigma + " et patchs = " + patchs + "x" + patchs);
     }
 
+    /**
+     * Performs and compares local and global PCA-based denoising on a noisy image using
+     * four different thresholding configurations:
+     *   - Soft Bayesian
+     *   - Hard Bayesian
+     *   - Soft VisuShrink
+     *   - Hard VisuShrink
+     * 
+     * The method divides the noisy image into overlapping zones for local denoising,
+     * applies PCA, projects coefficients, thresholds, reconstructs patches, and recomposes
+     * zones back into full images for each method. Then it also performs global denoising
+     * on the entire image with the same four configurations.
+     * 
+     * It evaluates each denoised image by computing MSE, PSNR, and improvement relative
+     * to the noisy image, saves results and images, and returns the best denoising result
+     * based on maximum PSNR.
+     * 
+     * @param pathOriginal the file path to the original clean image
+     * @param pathNoisy the file path to the noisy image
+     * @param sigma the noise standard deviation
+     * @param patchs the size of patches (patch dimension)
+     * @return a list containing two elements:
+     *         1. The file path of the best denoised image (highest PSNR)
+     *         2. The method label (e.g. "Local_Doux_Bayésien" or "Global_Dur_Visu")
+     * @throws Exception if image loading, processing, or saving fails
+     */
     public static List<String> optimiserDebruitage(String pathOriginal, String pathNoisy, int sigma, int patchs) throws Exception {
     	BufferedImage original = ImageIO.read(new File(pathOriginal));
     	BufferedImage noisy = ImageIO.read(new File(pathNoisy));
-    	
-    	// Local
-    	
+
     	int height = noisy.getHeight();
         int width = noisy.getWidth();
 
         int minDim = Math.min(width, height);
 
-        // Taille des sous-images = moitié de la plus petite dimension
         int W = minDim / 2;
-        // Pas = W / 2 = 1/4 de la dimension
         int pas = W / 2;
 
         System.out.println("Taille image : " + width + "x" + height + ", W = " + W + ", pas = " + pas);
 
         List<ImageZone> zones = ImageUtils.decoupeImage(noisy, W, pas);
 
-        // Préparation des listes pour les 4 méthodes
         List<List<ImageZone>> zonesParMethode = new ArrayList<>();
         for (int i = 0; i < 4; i++) zonesParMethode.add(new ArrayList<>());
 
@@ -242,7 +287,6 @@ public class Main {
             int offsetX = zone.getPosition()[0];
             int offsetY = zone.getPosition()[1];
 
-            // Pipeline
             List<Patch> patches = ImageUtils.extractPatches(subImage, patchs);
             List<double[]> vectors = patches.stream().map(Patch::toVector).toList();
             ACPResult acpResult = ACP.computeACP(vectors);
@@ -274,8 +318,6 @@ public class Main {
             }
         }
 
-        // Recomposition, sauvegarde et évaluation
-
         FileWriter fw = new FileWriter("images/results/resultats.txt");
         PrintWriter pw = new PrintWriter(fw);
         
@@ -292,7 +334,7 @@ public class Main {
             mse = Evaluation.mse(original, result);
             psnr = Evaluation.psnr(mse);
             double mseBruitee = Evaluation.mse(original, noisy);
-            //double psnrBruitee = Evaluation.psnr(mseBruitee);
+
             amelioration = (mseBruitee - mse) / mseBruitee * 100;
             
             if (maxPsnr < psnr) {
@@ -311,20 +353,14 @@ public class Main {
             mapImages.put(psnr, liste); 
         }
     	
-    	// Global
-    	
-    	
         List<Patch> patches = ImageUtils.extractPatches(noisy, patchs);
 
-        // 4. Conversion en vecteurs
         List<double[]> vectors = patches.stream()
                                         .map(Patch::toVector)
                                         .toList();
 
-        // 5. ACP
         ACPResult acpResult = ACP.computeACP(vectors);
 
-        // 6. Projection
         List<double[]> Vc = ACP.MoyCov(vectors).Vc;
         double[][] contributions = ACP.project(acpResult.base, Vc);
 
@@ -333,7 +369,6 @@ public class Main {
             boolean isSoft = softFlags[i];
             boolean isBayes = bayesFlags[i];
 
-            // Calcul lambda
             double lambda;
             if (isBayes) {
             	double sigmaSignal = Thresholding.estimateGlobalSigmaSignal(contributions, sigma);
@@ -342,11 +377,9 @@ public class Main {
             	lambda = Thresholding.seuilVisu(sigma, patchs * patchs);
             }
 
-            // Seuillage
             double[][] contributionsSeuillees;
             contributionsSeuillees = Thresholding.appliquerSeuillage(contributions, lambda, isSoft);
 
-            // Reconstruction
             List<double[]> reconstructions = Thresholding.reconstructionsDepuisContributions(
             		contributionsSeuillees, acpResult.base, acpResult.moyenne);
 
@@ -366,7 +399,7 @@ public class Main {
             mse = Evaluation.mse(original, result);
             psnr = Evaluation.psnr(mse);
             double mseBruitee = Evaluation.mse(original, noisy);
-            //double psnrBruitee = Evaluation.psnr(mseBruitee);
+
             amelioration = (mseBruitee - mse) / mseBruitee * 100;
             if (maxPsnr < psnr) {
             	maxPsnr = psnr;
@@ -390,6 +423,13 @@ public class Main {
         return mapImages.get(maxPsnr);     
     }
 
+    /**
+     * Loads an image from the given file path and converts it to grayscale.
+     *
+     * @param path the file path of the image to load
+     * @return a grayscale BufferedImage
+     * @throws Exception if the image cannot be read or the file does not exist
+     */
     public static BufferedImage loadImage(String path) throws Exception {
     	System.out.println(path);
         BufferedImage original = ImageIO.read(new File(path));
@@ -399,7 +439,13 @@ public class Main {
         gray.getGraphics().drawImage(original, 0, 0, null);
         return gray;
     }
-
+    /**
+     * Saves a BufferedImage to the specified file path in JPEG format.
+     *
+     * @param img the BufferedImage to save
+     * @param path the destination file path where the image will be saved
+     * @throws Exception if an error occurs during writing the file
+     */
     public static void saveImage(BufferedImage img, String path) throws Exception {
         File output = new File(path);
         ImageIO.write(img, "jpeg", output);
