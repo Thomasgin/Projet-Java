@@ -1,1 +1,0 @@
-Local_DouxBayes : MSE = 728,36, PSNR = 19,51 dB

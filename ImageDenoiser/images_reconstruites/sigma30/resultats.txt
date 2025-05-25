@@ -1,4 +1,0 @@
-DouxBayes : MSE = 233,15, PSNR = 24,45 dB
-DurBayes : MSE = 683,05, PSNR = 19,79 dB
-DouxVisu : MSE = 288,78, PSNR = 23,53 dB
-DurVisu : MSE = 133,16, PSNR = 26,89 dB
