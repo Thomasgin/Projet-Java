@@ -1,3 +1,20 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+/**
+ * Main class for image denoising using PCA-based global and local methods.
+ * Supports adding Gaussian noise and denoising with different thresholding
+ * techniques (VisuShrink, BayesShrink) and threshold types (soft, hard).
+ */
+public class Main {
+
 /**
      * Mean squared error between original and denoised images.
      */
