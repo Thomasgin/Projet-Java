@@ -31,11 +31,11 @@
   ├── README.md  
   └── sources.jar  
 
-    explications:  
-      - "analyse/ : diagrammes UML, planning, maquette UI."    
-      - "projet/images/ : images sources, bruitées, résultats."    
-      - "projet/lib/ : bibliothèques tierces (ex : commons-math)."  
-      - "projet/src/ : code source Java."  
+  explications:  
+    - "analyse/ : diagrammes UML, planning, maquette UI."    
+    - "projet/images/ : images sources, bruitées, résultats."    
+    - "projet/lib/ : bibliothèques tierces (ex : commons-math)."  
+    - "projet/src/ : code source Java."  
 
   prerequis:   
     - "Java JDK 11 minimum (Java 17 recommandé)."   
@@ -58,9 +58,9 @@
   execution:    
     instructions:   
       - "Sous Linux/macOS :"    
-      - "  java --module-path /chemin/vers/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -jar MaquetteApp.jar"  
+      - "  java --module-path /chemin/vers/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml -jar Application.jar"  
       - "Sous Windows (PowerShell) :"     
-      - "  java --module-path C:\\chemin\\vers\\javafx-sdk\\lib --add-modules javafx.controls,javafx.fxml -jar MaquetteApp.jar"    
+      - "  java --module-path C:\\chemin\\vers\\javafx-sdk\\lib --add-modules javafx.controls,javafx.fxml -jar Application.jar"    
 
   utilisation:   
     description: >   
