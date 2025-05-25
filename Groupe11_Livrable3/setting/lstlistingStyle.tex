@@ -1,0 +1,40 @@
+% Java box
+% Couleurs inspirées d'IntelliJ (Dark Theme)
+\definecolor{intellij-blue}{RGB}{100, 130, 240}        % Mots-clés
+\definecolor{intellij-method}{RGB}{102, 217, 239}     % Méthodes
+\definecolor{intellij-string}{RGB}{152, 195, 121}     % Strings
+\definecolor{intellij-comment}{RGB}{92, 99, 112}      % Commentaires
+\definecolor{intellij-purple}{RGB}{197, 165, 197}     % Appels de méthode
+\definecolor{intellij-number}{RGB}{209, 154, 102}     % Nombres
+
+\lstdefinestyle{intellij-java}{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{intellij-blue},               % public, class, etc.
+    commentstyle=\color{intellij-comment}\itshape,    % Commentaires
+    stringstyle=\color{intellij-string},              % Strings
+    numberstyle=\color{intellij-number},              % Nombres
+    showstringspaces=false,
+    breaklines=true,
+    frame=shadowbox,
+    rulecolor=\color{gray!30},
+    numbers=left,
+    tabsize=4,
+	morecomment=[1]{//},
+    % Personnalisation supplémentaire
+    morekeywords={String,int,boolean,void},           % Types
+    emph={                                             % Noms de méthodes
+        println, equals, toString, main
+    },
+    emphstyle=\color{intellij-method},
+    emph={[2]                                          % Appels de méthode
+        .length, .substring, .charAt
+    },
+    emphstyle={[2]\color{intellij-purple}},
+    literate=                                          % Opérateurs spéciaux
+        {+}{{{\color{intellij-blue}+}}}1
+        {-}{{{\color{intellij-blue}-}}}1
+        {*}{{{\color{intellij-blue}*}}}1
+        {/}{{{\color{intellij-blue}/}}}1
+        {=}{{{\color{intellij-blue}=}}}1
+}

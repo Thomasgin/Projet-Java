@@ -1,0 +1,138 @@
+\section{Réponse au problème}
+
+\subsection{Approche mathématiques}
+\subsubsection{Préambule}
+Pour commencer nos explications, nous allons démontrer que l'on peut décomposer un vecteur \(V\) correspondant à un patch dans une base orthonormée.\newline
+\begin{figure}[hbt!]
+    \input{reference/maths/demoMaths.tex}
+    \caption{Démonstration de la décomposition de V dans une base orthonormée}
+\end{figure}
+
+\subsection{Transformation du problème en mathématiques}
+Tout d'abord, l’objectif du débruitage est de travailler sur des patchs qui sont des petits carrées de pixels extraient de l'image. Nous allons représenter ces patchs sous forme de vecteurs dont les valeurs sont des nuances de gris comprises entre \([0,255]\). Les \(s\) pixels de la première ligne seront les \(s\) premières composantes du vecteurs, ainsi de suite. \paragraph{}
+Nous allons ensuite débruiter l'image à l'aide de l'ACP appliquée à ces vecteurs. L'ACP va transformer les observations de variables corrélées en observations de variables non corrélées, ce qui va centrer les variables principales, et ainsi rendre aberrantes les variables de bruits. \paragraph{}
+En appliquant un seuillage avec une valeur seuil, nous pourrons supprimer les variables aberrantes, et donc supprimer le bruit.
+
+\subsection{Approche informatique}
+Comme demandé, notre application permettant de répondre à cette problématique de bruitage est développé en Java et l'interface graphique à l'aide de JavaFX. \par
+Pour ce qui est de la structure du code, nous avons divisé le problème en plusieurs classes :
+
+\subsubsection{ACP}
+Cette classe est utilisée pour appliquer l'Analyse en Composante Principale sur chaque patch extrait de l'image bruitée.
+Elle est composée de trois méthodes :
+\begin{itemize}
+    \item public static ACPResult computeACP(List\BAN{double[ ]} V) : applique l'ACP sur un vecteur placé en paramètre
+    \item public static MoyCovResult MoyCov(List\BAN{double[ ]} V) : calcule la moyenne de covariance d'un vecteur placée en paramètre
+    \item public static double[ ][ ] project(double[ ][ ] U, List\BAN{double[ ]} Vc) : calcule la contribution des vecteurs
+\end{itemize}
+
+
+\subsubsection{Evaluation}
+Cette classe va servir à calculer les indicateurs de performances de notre débruitage au travers des indicateurs que sont le MSE et le PSNR. \\
+Voici les méthodes de cette classe :
+\begin{itemize}
+    \item public static double mse(BufferedImage original, BufferedImage denoised) : calcule le mse
+    \item public static double psnr(double mse) : calcule le PSNR
+\end{itemize}
+
+\subsubsection{ImageUtils}
+Cette classe va représenter l'image sur laquelle nous travaillons et va lui appliquer les différentes méthodes afin de la bruiter puis de la débruiter
+\begin{itemize}
+    \item public static BufferedImage noising(BufferedImage X0, double sigma) : bruite l'image
+    \item public static List\BAN{Patch} extractPatches(BufferedImage X, int s) : extrait des patchs de l'image
+    \item public static BufferedImage reconstructPatches(List\BAN{Patch} patches, int height, int width) : reconstruit l'image à partir de sa liste de patchs
+    \item public static List\BAN{ImageZone} decoupeImage(BufferedImage X, int W, int n) : découpe une image en plusieurs sous images
+    \item public static List\BAN{VectorWithPosition} VectorPatchs(List<Patch> patches) : convertit un patch en vecteur et l'enregistre avec les coordonnées du patch
+    \item public static double computeMSE(BufferedImage img1, BufferedImage img2) : calcul le MSE entre 2 images
+    \item public static double computePSNR(double mse) : calcul le PSNR à partir du MSE
+\end{itemize}
+
+\subsubsection{Maquette}
+Cette classe est utilisée pour créer l'Interface Homme-Machine de notre projet.
+Elle est composée de plusieurs méthodes :
+\begin{itemize}
+    \item public void start(Stage primaryStage) : permet de construire et démarrer l'application
+    \item private VBox createParamGroup(String labelText, Control control) : permet de créer un groupe de deux paramètres dans une VBox
+    \item private VBox createParamGroup(String labelText, Slider slider, Label valueLabel) : permet de créer un groupe de trois paramètres dans une VBox
+    \item private VBox createImageBoxImportable(String defaultText, String caption) : permet de créer une VBox qui contient une image et un bouton
+    \item private VBox createDynamicImageBoxNoised(String defaultText, String caption) : permet de créer une VBox qui contiendra l'image bruitée
+    \item private VBox createDynamicImageBoxDenoised(String defaultText, String caption) : permet de créer une VBox qui contiendra l'image débruitée
+    \item private VBox createMetricBox(double value, String label) : permet de créer une VBox qui contient les statistiques de l'image débruitée
+    \item public static void main(String[ ] args) : appelle la méthode start qui lance l'application
+\end{itemize}
+
+\subsubsection{Patch}
+Cette classe permet de crée des instances de patchs
+\begin{itemize}
+    \item public Patch(double[ ] data, int x, int y) : un constructeur de patch depuis un vecteur
+    \item public double[ ] toVector() : getter de l'attribut de Patch qui contient le vecteur qui représente le patch 
+    \item public static Patch fromVector(double[ ] v, int x, int y) : instancie un nouveau patch à partir d'un vecteurs et deux coordonnées
+\end{itemize}
+
+\subsubsection{Tresholding}
+Cette classe contient l'ensemble des méthodes de seuillage utilisés sur les résultats de l'ACP
+\begin{itemize}
+    \item public static double seuilVisu(double sigma, int size) : calcule le seuil utilisé par la méthode visu
+    \item public static double seuilBayes(double sigma, double sigmaSignal) : calcule le seuil utilisé par la méthode Bayes
+    \item public static double estimateGlobalSigmaSignal(double[ ][ ] contributions, double sigma) : estime l'écart-type du signal utile
+    \item public static double soft(double lambda, double x) : applique un seuillage doux sur une variable
+    \item public static double hard(double lambda, double x) : applique un seuillage dur sur une variable
+    \item public static double[ ][ ] appliquerSeuillage(double[ ][ ] contributions, double lambda, boolean isSoft) : applique le suillage selon celui renseigné
+    \item public static List\BAN{double[ ]} reconstructionsDepuisContributions : reconsrtuits les données après le seuillage
+\end{itemize}
+
+\subsubsection{Classes de stockage}
+Notre code contient également des classes de stockage :
+\begin{itemize}
+    \item ACPResult : récupère les résultats de l'ACP
+    \item ImageZone : récupère des sous-images extraites de l'image originale dans le but d'appliquer l'ACP locale
+    \item MoyCovResult : récupère les résultats de la moyenne de covariance des vecteurs
+    \item VectorWithPosition : permet de stocker un vecteur avec les coordonnées du patch qu'il représente
+\end{itemize}
+
+\subsubsection{Main}
+Classe principale du programme permettant d'appliquer l'ensemble du processus de bruitage et de débruitage de l'image.
+
+\begin{itemize}
+    \item public static void bruitage(String path, int sigma) throws Exception
+    \begin{enumerate}
+        \item Charge une image
+        \item Lui applique un bruit gaussien
+        \item Enregistre l'image
+    \end{enumerate}
+    \item public static void debruitageGlobal(String pathOriginal, String pathNoisy, int sigma, int patchs, String extractionType, String seuillageMethod, String seuilType) throws Exception
+    \begin{enumerate}
+        \item Extrait les patchs de l'image bruitée
+        \item Convertit ce patch en vecteur
+        \item Applique l'ACP sur ces vecteurs
+        \item Projete les résultats
+        \item Calcul le lambda pour le seuillage
+        \item Applique le seuillage voulu
+        \item Reconstruit l'image débruité
+        \item Calcul les indicateurs de performances (MSE, PSNR, \% d'amélioration)
+        \item Sauvegarde les performances du débruitages dans un fichier texte
+    \end{enumerate}
+    \item public static void debruitageLocal(String pathOriginal, String pathNoisy, int sigma, int patchs, String extractionType, String seuillageMethod, String seuilType) throws Exception
+    \item public static BufferedImage loadImage(String path) throws Exception : permet de charger une image depuis un chemin placé en paramètre
+    \item public static void saveImage(BufferedImage img, String path) throws Exception : permet de sauvegarder une image dans un répertoire dont le chemin est placé en paramètre
+\end{itemize}
+
+\subsection{Approche individuelle}
+Pour la répartition des tâches lors de ce projet, nous nous sommes appuyés sur les capacités de chacun des membres du groupe. Dans les grandes lignes, nous avons suivis cette répartition :
+\begin{description}
+    \item[Antonin] : code de l’application (hors IHM) 
+    \item[Clément] : écriture des rendus et démonstration mathématiques, analyse UML
+    \item[Mathias] : code de l'application (hors IHM) et rapport intermédiaire
+    \item[Mattias] : écriture des rendus, commentaires du code, analyse UML
+    \item[Thomas] : code de l'IHM 
+\end{description}
+Vous pourrez trouver une répartition des tâches plus précise sur GitHub (analyse/gantt/ganttL1.mmd) et un aperçu en annexe (\ref{fig:gantt})\par
+En plus de l'utilisation de GitHub pour l'organisation du code et des rendus, nous consacrions 15 minutes pour que chaque personne explique au reste du groupe ce qu'elle a fait et ce qu'elle projette de faire ou d'améliorer afin de progresser dans une même direction et de nous adapter aux travaux de chacun.\par  
+
+
+\subsection{Choix initiaux}
+\subsubsection{Diagramme de classe et de séquence}
+Pour le diagramme de classe, la structure générale n'a pas été modifié. Nous avons simplement ajouter des classes de stockage et ajouté certaines méthodes intermédiaires pour simplifier le code.\par
+Pour le diagramme de séquences, nous avons écouté les retours de notre première réunion et modifié le diagramme afin qu'il corresponde à ce que nous avions réellement codé.
+\subsubsection{Répartition des tâches}
+Nous avons complété celle-ci afin qu'elle recouvre l'ensemble du projet. Comme expliquer précédemment, nous avons suivi la dynamique de la première phase avec 2 à 3 personnes concentrées sur le codes et les autres sur l'écriture des rapports ou de la documentation. 

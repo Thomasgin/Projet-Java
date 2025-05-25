@@ -1,0 +1,18 @@
+\section{Introduction} 
+
+% Contexte
+\paragraph{}
+Le traitement d’images est un domaine clé en informatique, avec des applications dans la photographie numérique, le médical ou la sécurité. Dans le cadre de ce projet, nous nous intéressons à une problématique classique mais toujours d’actualité : le débruitage d’images numériques.
+
+% Problématique
+\paragraph{}
+Une image acquise par un capteur, comme une caméra ou un scanner, est souvent altérée par différents types de bruit. Le bruit que nous considérons ici est le bruit gaussien additif, modélisé comme un signal aléatoire centré, généralement issu de perturbations électroniques internes au capteur ou de conditions d’acquisition difficiles (faible lumière, température, etc.). Ce bruit est non structuré, souvent peu visible à l’œil nu, mais peut considérablement nuire à la qualité de traitement et d’analyse de l’image.
+
+% Objectifs
+\paragraph{}
+L’objectif principal de ce projet est de restaurer une image dégradée par du bruit gaussien en estimant l’image originale la plus probable. Pour cela, nous utilisons une méthode statistique puissante : l’analyse en composantes principales (ACP) ou, en anglais, Principal Component Analysis (PCA). L’ACP permet de transformer un ensemble de données corrélées (ici, les petits blocs d’image appelés patchs) en un espace où les données sont représentées de façon plus compacte et moins redondante.
+
+% Organisation
+\paragraph{}
+Dans ce rapport, nous expliquerons la méthode mathématiques que nous allons utiliser pour débruiter l'image ainsi que l'implémentation d'une interface homme-machine (IHM). Nous analyserons ensuite les résultats obtenus selon le type de débruitage que nous appliquerons afin de déterminer une méthode optimale pour débruiter une image.
+Nous étudierons et comparerons deux variantes principales de l'ACP : une approche globale (PGPCA), où l’analyse est faite sur l’ensemble des patchs de l’image, et une approche locale (PLPCA), qui applique l’ACP sur des zones restreintes.

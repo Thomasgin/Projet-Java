@@ -1,0 +1,98 @@
+\section{Présentation des résultats}
+\subsection{Préambule}
+Dans tout ce projet, nous avions 3 indicateurs afin de déterminer la qualité de notre débruitage :
+\subsubsection{MSE} 
+Il mesure la différence moyenne au carré entre l'image originale (de référence) et l'image débruitée.
+ \[
+    \TXT{MSE}= \dfrac{1}{lc}\SUM{i=1}{l}\SUM{j=1}{c}\BLR{(}{X(i,j)-Y(i,j)}{)}^2
+ \]
+ avec \(X\) l'image bruité et \(Y\) l'image débruité, \((l,c)\) le nombre de lignes et colonnes et \((i,j)\) la position des pixels. \par
+ Pour son interprétation, un MSE\(=0\) signifie que les deux images sont identiques et plus il est élevé, plus l'image débruité est dégradée
+ \subsubsection{PSNR}
+ Le PSNR (en dB) compare le signal maximal possible (valeur maximale d'un pixel, dans notre cas 255) au bruit (erreur mesurée par le MSE).
+ \[
+    \TXT{PSNR}=10\cdot\log_{10}\BLR{(}{\dfrac{255^2}{\TXT{MSE}}}{)}
+ \]
+Pour son interprétation, on suit les règles suivantes :
+\begin{itemize}
+    \item inférieur à 20 dB : qualité médiocre
+    \item entre 30 dB et 40 dB : qualité acceptable voire bonne
+    \item supérieur à 40 dB : très bonne qualité
+\end{itemize}
+
+\subsubsection{Amélioration}
+Il s'agit d'une variable que nous avons ajouté et qui permet de définir un pourcentage d'amélioration en suivant la formule suivante :
+\[
+    \TXT{amelioration} = \dfrac{\TXT{mseBruitee} - \TXT{mse}}{\TXT{mseBruitee}}*100
+\]
+ 
+\subsection{Valeur idéale de taille de patch}
+
+Dans un premier temps, nous avons cherché à déterminer quelle était la taille optimale de patch pour obtenir les meilleures performances de débruitage. La table ci-dessous présente les résultats obtenus avec une méthode globale, un seuillage dur et un seuil de type VisuShrink (sigma = 20, image Lena).
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+        Taille du patch & MSE & PSNR & Amélioration \\ \hline
+        5x5 & 48.20 & 31.30 & 87.92 \%\\ \hline
+        6x6 & 43.34 & 31.76 & 89.14 \%\\ \hline
+        7x7 & 41.27 & 31.97 & 89.66 \%\\ \hline
+        8x8 & 40.52 & 32.05 & 89.85 \%\\ \hline
+        9x9 & 40.66 & 32.04 & 89.81 \%\\ \hline
+        10x10 & 41.17 & 31.98 & 89.68 \%\\ \hline
+        11x11 & 41.55 & 31.94 & 89.59 \%\\ \hline
+        12x12 & 42.26 & 31.87 & 89.41 \%\\ \hline
+    \end{tabular}
+    \caption{Valeurs de performances selon la taille des patchs}
+\end{table}
+
+On observe que la performance augmente avec la taille du patch jusqu’à 8x8, puis se stabilise, voire régresse légèrement. La taille 8x8 fournit le meilleur compromis, avec une MSE minimale (40.52) et un PSNR maximal (32.05 dB). Cette taille offre donc une couverture spatiale suffisante pour l’ACP tout en évitant de mélanger des zones trop hétérogènes.
+
+
+\subsection{Limites de notre programme}
+
+Nous avons ensuite évalué les limites de notre programme du point de vue des temps d'exécution, en faisant varier la taille de l'image d'entrée. Le tableau ci-dessous indique le temps total nécessaire pour effectuer les 8 méthodes de débruitage, pour un niveau de bruit de $\sigma = 25$.
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabular}{|l|c|c|c|c|}
+    \hline
+        Taille de l'image & 128x128 & 256x256 & 512x512 & 1024x1024 \\ \hline
+        Temps d’exécution & 1,2 s & 3,5 s & 11,4 s & 43,3 s \\ \hline
+    \end{tabular}
+    \caption{Temps d’exécution selon la taille de l'image}
+\end{table}
+
+On constate une croissance quasi-exponentielle du temps d'exécution avec la taille de l’image. Cette tendance est attendue, car une image plus grande implique un plus grand nombre de pixels, donc un plus grand nombre de patchs à extraire, projeter, seuiller et reconstruire. Cette complexité s'applique pour chacune des 8 méthodes, expliquant les temps cumulés observés.
+
+
+\subsection{Détermination de la meilleure méthode}
+
+Enfin, nous avons comparé les 8 combinaisons possibles de méthode de seuillage (doux ou dur), calcul de seuil (VisuShrink ou BayesShrink), et mode d’ACP (global ou local). Les résultats suivants ont été obtenus sur l’image Lena bruitée avec $\sigma = 25$, en utilisant des patchs 8x8.
+
+\begin{table}[hbt!]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+        Méthode utilisée & MSE & PSNR & Amélioration \\ \hline
+        Global/Doux/Visu & 246.55 & 24.21 & 44.26 \%\\ \hline
+        Global/Doux/Bayes & 212.78 & 24.85 & 51.90 \%  \\ \hline
+        Global/Dur/Visu & 87.89 & 28.69 & 80.13 \% \\ \hline
+        Global/Dur/Bayes & 421.16 & 21.89 & 4.79 \% \\ \hline
+        Local/Doux/Visu & 243.26 & 24.27 & 45.01 \% \\ \hline
+        Local/Doux/Bayes & 202.40 & 25.07 & 54.24 \%\\ \hline
+        Local/Dur/Visu & 87.04 & 28.73 & 80.32 \% \\ \hline
+        Local/Dur/Bayes & 416.45 & 21.94 & 5.85 \% \\ \hline
+    \end{tabular}
+    \caption{Performances des différentes méthodes}
+\end{table}
+
+L'analyse des résultats montre clairement que les méthodes utilisant un seuillage dur couplé à VisuShrink (en global ou local) offrent les meilleurs scores en MSE et PSNR, avec environ 80\% d'amélioration. La meilleure méthode est Local/Dur/Visu avec une MSE de 87.04 et un PSNR de 28.73 dB.
+
+Les méthodes utilisant BayesShrink en combinaison avec un seuillage dur donnent au contraire les pires performances, ce qui s'explique par une estimation de seuil trop faible et une élimination excessive du signal utile.
+
+Les variantes douces (soft) donnent des résultats intermédiaires, avec un meilleur équilibre entre atténuation du bruit et conservation des détails.
+
+On retiendra donc que la meilleure méthode sur cette image est celle utilisant un seuillage dur avec VisuShrink, en ACP locale.\par
+En annexe (\ref{fig:lenaSource}), vous trouverez un de nos résultats pour la méthode Global/Dur/Visu sur l'image Lena.

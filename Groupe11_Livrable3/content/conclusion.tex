@@ -1,0 +1,16 @@
+\section{Conclusion}
+\subsection{Résultats}
+Pour ce qui concerne les résultats, même si les indicateurs mathématiques nous disent que l'un de nos débruitage est très bon, l'image finale obtenue paraît bien, mais reste avec un léger flou. Les résultats obtenus avec notre batterie de méthodes sont satisfaisants mais loin d'être parfait.\par
+On notera en particulier que les méthodes de Bayes ne donnent jamais de bon résultats, le bruit persiste dans les images débruitées. \par
+Dans les recherches auxiliaires que nous avons faites, nous avons trouvé un article où des personnes ont développé une IA capable de supprimer un bruit gaussien sans connaître le \(\sigma\) de départ. Cette IA combine les estimations de débruitage avec des probabilités pour différents niveaux de bruit. Tout cela est appuyé par un système de neurones qui optimise les paramètres de débruitage. \par
+Ces recherches permettent de mettre en perspective nos résultats et de les comprendre. Nous remarquons qu'il est nécessaire de déployer des gros moyens (IA, apprentissage) afin de réussir un débruitage sur des bruits gaussiens qui soit très bon. Cependant, il est rappelé dans l'article que ce système ne fonctionne que sur des bruits gaussien et non suivant un loi de Poisson ou autre, ce qui montre la difficulté de la suppression des bruits. \par
+Pour revenir sur des solutions plus simple que nous pourrions implémenter, il existe une méthode de débruitage qui fusionne la méthode globale et local que nous avons utilisé. D'après certaines études du sujet, de plus gros programme prennent comme base de code une fusion entre une méthode global et local afin de conserver les détails fins avec le local et l’aperçu générale de l'image avec le global.
+
+\subsection{Expériences}
+Ce projet a été bénéfique pour nous tous et nous a permis de développer des capacités individuelles qui nous serons utiles pour le monde professionnel.\par
+Pour les personnes concentrés sur le code, ils ont accrus leurs compétences en Java ainsi que dans le codages d'applications plus importantes que ce qui a été vu en TP. Ils devaient également se contraindre aux analyses UML faites en amont. \par
+Pour tous les membres du groupe, nous avons dû apprendre à comprendre du code écrit par quelqu'un d'autre et de s'en servir.\par
+Pour ce qui est des soft-skills, la communication, le travail en groupe et l'autonomie ont été travaillés durant ce projet.
+
+\subsection{Ouverture}
+Ce travail ouvre la voie à des améliorations concrètes : intégrer une fusion locale/globale, ou utiliser des librairies d'IA comme TensorFlow pour le pré-traitement. Dans un contexte professionnel, où l'analyse d'images médicales ou satellitaires exige à la fois précision et rapidité, de telles optimisations deviendraient indispensables.
