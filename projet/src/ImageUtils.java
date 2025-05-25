@@ -1,3 +1,9 @@
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.util.Random;
+import java.awt.image.Raster;
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Utility class providing helper methods for image denoising.
  * Includes operations such as adding Gaussian noise, extracting and reconstructing patches,
