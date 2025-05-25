@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Provides thresholding methods used in the denoising process,
  * including VisuShrink and BayesShrink thresholds,
