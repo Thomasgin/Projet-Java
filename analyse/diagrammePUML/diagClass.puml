@@ -95,19 +95,16 @@ class VectorWithPosition {
 class Main {
     + mse: double
     + psnr: double
+    + minMse: double
+    + maxPsnr: double
     + amelioration: double
+    + maxAmelioration: double
     {static} + __bruitage(path: String, sigma: int)__ : void
-    {static} + __debruitage(
-        pathOriginal: String,
-        pathNoisy: String,
-        sigma: int,
-        patchs: int,
-        extractionType: String,
-        seuillageMethod: String,
-        seuilType: String
-    )__ : void
-    {static} + __loadImage(path: String)__ : BufferedImage
-    {static} + __saveImage(img: BufferedImage, path: String)__ : void
+    {static} + debruitageGlobal(pathOriginal: String, pathNoisy: String,sigma: int, patchs: int,extractionType: String, seuillageMethod: String,seuilType: String) : void
+    {static} + debruitageLocal(pathOriginal: String,pathNoisy: String,sigma: int,patchs: int,extractionType: String,seuillageMethod: String,seuilType: String) : void
+    {static} + optimiserDebruitage(pathOriginal: String,pathNoisy: String,sigma: int,patchs: int): List<String>
+    {static} + loadImage(path: String) : BufferedImage
+    {static} + saveImage(img: BufferedImage, path: String): void
 }
 
 '### Relations ###
