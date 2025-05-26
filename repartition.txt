@@ -1,5 +1,5 @@
 🔷 PLAN ORAL — Durée totale : 14min30s à 15min
-🎬 0. Introduction et accroche (1 min)
+🎬 0. Introduction et accroche (1 min) -------------CLEMENT
 Présenter l’équipe en 10s.
 
 Contexte et problématique :
@@ -10,7 +10,7 @@ Objectif SMART :
 
 "Développer un outil efficace et interactif de débruitage d’images par ACP, applicable à différentes méthodes, patchs, seuils, en moins de 3 secondes par image 512x512, pour produire une image la plus fidèle possible."
 
-🧠 1. Théorie et approche mathématique (2 min)
+🧠 1. Théorie et approche mathématique (2 min) -------------ANTONIN
 Expliquer très simplement ce qu’est l’ACP (sans rentrer dans les équations).
 
 Montrer visuellement (sur slide ou schéma) la projection → seuillage → reconstruction.
@@ -21,7 +21,7 @@ Glisser une phrase sur le lien avec les bases orthonormées et projections.
 
 → Coche Critère 6a, 1d, 7a.
 
-💻 2. Architecture logicielle (2 min)
+💻 2. Architecture logicielle (2 min) -------------MATHIAS
 Diagramme de classes (1 slide max) : expliquer les grandes classes :
 
 "ImageUtils pour la gestion d’image, Thresholding pour le seuillage, ACP pour l’analyse math, et une interface JavaFX intuitive."
@@ -32,7 +32,7 @@ Citer la gestion des fichiers, le bruitage, et l’export automatique des résul
 
 → Coche Critère 6b, 2, 3b, 5.
 
-⚙️ 3. Fonctionnalités & IHM (2 min)
+⚙️ 3. Fonctionnalités & IHM (2 min) -------------THOMAS
 Démonstration vidéo (2 min maximum, fluide, préparée à l’avance).
 
 Bruitage d'une image, réglage des paramètres (sigma, patchs, méthode), puis comparaison des résultats.
@@ -49,7 +49,7 @@ affichage MSE / PSNR
 
 → Coche Critère 4, 5, 10d.
 
-📊 4. Résultats et interprétation (3 min)
+📊 4. Résultats et interprétation (3 min) -------------MATTIAS
 3 tableaux synthétiques (tirés du rapport) :
 
 Meilleur patch = 8x8
@@ -66,7 +66,7 @@ Mentionner les résultats mauvais avec Bayes + Dur → justifier.
 
 → Coche Critères 8e, 8f, 8g.
 
-📉 5. Limites, bugs et itérations (2 min)
+📉 5. Limites, bugs et itérations (2 min) -------------THOMAS
 Expliquer :
 
 Problème du trait vertical avec patch pair (résolu)
@@ -83,7 +83,7 @@ Deep learning avec estimation automatique du bruit
 
 → Coche Critères 10, 7b.
 
-🧑‍🤝‍🧑 6. Travail collaboratif (1 min)
+🧑‍🤝‍🧑 6. Travail collaboratif (1 min) -------------CLEMENT
 Organisation : GitHub + 15 min de réu tous les 2 jours.
 
 Répartition des tâches équilibrée (IHM, maths, code, rapport).
@@ -92,7 +92,7 @@ Bonne coordination malgré les spécialités différentes.
 
 → Coche Critère 9.
 
-🎯 7. Conclusion (1 min)
+🎯 7. Conclusion (1 min) -------------CLEMENT
 Résumé : projet complet, code propre, résultats solides.
 
 Fonctionne sur toute image, 4 méthodes × 2 seuils = 8 résultats.
