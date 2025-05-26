@@ -1,0 +1,106 @@
+🔷 PLAN ORAL — Durée totale : 14min30s à 15min
+🎬 0. Introduction et accroche (1 min)
+Présenter l’équipe en 10s.
+
+Contexte et problématique :
+
+"Aujourd’hui, les images sont partout : médecine, photographie, surveillance... et elles sont souvent bruitées. Ce bruit peut dégrader la qualité et rendre l’analyse impossible. Notre projet visait à restaurer ces images automatiquement."
+
+Objectif SMART :
+
+"Développer un outil efficace et interactif de débruitage d’images par ACP, applicable à différentes méthodes, patchs, seuils, en moins de 3 secondes par image 512x512, pour produire une image la plus fidèle possible."
+
+🧠 1. Théorie et approche mathématique (2 min)
+Expliquer très simplement ce qu’est l’ACP (sans rentrer dans les équations).
+
+Montrer visuellement (sur slide ou schéma) la projection → seuillage → reconstruction.
+
+Expliquer le rôle des patchs et du seuillage Visu/Bayes, Dur/Soft.
+
+Glisser une phrase sur le lien avec les bases orthonormées et projections.
+
+→ Coche Critère 6a, 1d, 7a.
+
+💻 2. Architecture logicielle (2 min)
+Diagramme de classes (1 slide max) : expliquer les grandes classes :
+
+"ImageUtils pour la gestion d’image, Thresholding pour le seuillage, ACP pour l’analyse math, et une interface JavaFX intuitive."
+
+Mentionner la division Global vs Local et les différences.
+
+Citer la gestion des fichiers, le bruitage, et l’export automatique des résultats.
+
+→ Coche Critère 6b, 2, 3b, 5.
+
+⚙️ 3. Fonctionnalités & IHM (2 min)
+Démonstration vidéo (2 min maximum, fluide, préparée à l’avance).
+
+Bruitage d'une image, réglage des paramètres (sigma, patchs, méthode), puis comparaison des résultats.
+
+Expliquer les éléments clés de l’IHM :
+
+sliders pour patchs et bruit
+
+menu déroulant pour les méthodes
+
+boutons bruitage / débruitage / optimal
+
+affichage MSE / PSNR
+
+→ Coche Critère 4, 5, 10d.
+
+📊 4. Résultats et interprétation (3 min)
+3 tableaux synthétiques (tirés du rapport) :
+
+Meilleur patch = 8x8
+
+Meilleur méthode = Local + VisuShrink + Dur
+
+Temps d’exécution selon la taille
+
+Interpréter :
+
+"On observe une amélioration de 80% en MSE, et un PSNR de presque 29 dB, ce qui correspond à une très bonne qualité visuelle."
+
+Mentionner les résultats mauvais avec Bayes + Dur → justifier.
+
+→ Coche Critères 8e, 8f, 8g.
+
+📉 5. Limites, bugs et itérations (2 min)
+Expliquer :
+
+Problème du trait vertical avec patch pair (résolu)
+
+Limites sur grandes images (temps)
+
+Problème d’estimation de σ_signal (Bayes)
+
+Propositions d’amélioration :
+
+Fusion local/global
+
+Deep learning avec estimation automatique du bruit
+
+→ Coche Critères 10, 7b.
+
+🧑‍🤝‍🧑 6. Travail collaboratif (1 min)
+Organisation : GitHub + 15 min de réu tous les 2 jours.
+
+Répartition des tâches équilibrée (IHM, maths, code, rapport).
+
+Bonne coordination malgré les spécialités différentes.
+
+→ Coche Critère 9.
+
+🎯 7. Conclusion (1 min)
+Résumé : projet complet, code propre, résultats solides.
+
+Fonctionne sur toute image, 4 méthodes × 2 seuils = 8 résultats.
+
+Impact : très utile pour des cas réels (médecine, imagerie satellite).
+
+Phrase finale :
+
+"Ce projet nous a appris à coder proprement, à travailler en équipe, et surtout à rendre des méthodes mathématiques puissantes accessibles et utiles."
+
+→ Coche Critère 1c, 5.1.
